@@ -1,5 +1,4 @@
 C_FILENAME = "movies.txt"
-C_PATTERN = "Max"
 # method to print a movie data
 def print_movies(a_movies,i_records)
 a_movies[0..i_records].each {| i | 
