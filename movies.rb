@@ -1,9 +1,8 @@
 
-C_HASH_DEFS = {:filename_zip => "movies.txt.zip", 
-            :filename_txt => "movies.txt", 
-            :country => "USA"}
-C_HASH_DATA_STRUCTURE = {:link=>nil, :c_title=>nil, :r_year=>nil, :country=>nil, :r_date=>nil, 
-                        :genre=>nil, :runtime=>nil, :rating=>nil, :director=>nil, :stars=>nil}
+C_HASH_DEFS = {filename_zip: "movies.txt.zip", 
+            filename_txt: "movies.txt", 
+            country: "USA"}
+C_HASH_DATA_STRUCTURE = %i[link c_title r_year country r_date genre runtime rating director stars]
 
 require 'zip'
 
@@ -27,7 +26,7 @@ end
 a_movies = Hash.new
 a_movies = Zip::File.new(C_HASH_DEFS[:filename_zip]).read(C_HASH_DEFS[:filename_txt]).split("\n").map {
                         |record|
-                            Hash[C_HASH_DATA_STRUCTURE.keys.zip(record.split("|"))] }
+                            C_HASH_DATA_STRUCTURE.zip(record.split("|")).to_h }
 
 #print the 5 longest movies
 puts "###   The 5 longest movies   ###"
