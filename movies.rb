@@ -47,8 +47,8 @@ puts a_movies.sort_by {|i| i.director.split.last}.map {|i| [i.director]}.uniq
 #print the number of the movies shooted not in the USA
 puts "\nThe number of the movies shoted not in the USA: #{a_movies.count {|i| !i.country.include? C_HASH_DEFS[:country] }.to_s} \n\n"                      
 
-#print number of movies shooted by monthes      
-puts "###   number of movies shooted by monthes   ###"   
+#print number of movies shooted by months      
+puts "###   number of movies shooted by months   ###"   
 x = a_movies.inject(Hash.new(0)) { |h,i| 
                                     #get and check month data
                                     begin
