@@ -11,8 +11,8 @@ require 'date'
 
 # method to print a movie data
 def print_movies(a_movies,i_records)
-a_movies[0..i_records].each {| i | 
-                        puts "#{i[:title]} (#{i[:r_date]}; #{i[:genre]}) - #{i[:runtime]} min"} 
+a_movies[0..i_records].each {| movie | 
+                        puts "#{movie[:title]} (#{movie[:r_date]}; #{movie[:genre]}) - #{movie[:runtime]} min"} 
 end
 
 #check params
@@ -29,6 +29,7 @@ end
 zip_file = Zip::File.new(DEFS[:filename_zip]).read(DEFS[:filename_txt])
 #parse data to array of OpenStruct objects
 movies = CSV.parse(zip_file,:col_sep=>"|",:headers=>DATA_STRUCTURE).map{ |i| OpenStruct.new(i.to_h) }
+
 #print the 5 longest movies
 puts "###   The 5 longest movies   ###"
 print_movies(movies.sort_by { |movie| movie.runtime.scan(/[0-9]/).join.to_i }.reverse,5)
