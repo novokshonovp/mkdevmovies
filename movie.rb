@@ -1,5 +1,5 @@
-class Movie
-  ATTRIBUTES = [:link, :title, :r_year, :country, :r_date, :genres, :runtime, :rating, :director, :actors]
+ class Movie
+  ATTRIBUTES = %i[ link title r_year country r_date genres runtime rating director actors]
   attr_reader *ATTRIBUTES
   def initialize(movie,movie_collection)
     @movies_collection =  movie_collection
@@ -9,23 +9,31 @@ class Movie
     @country = movie.country
     @r_date = movie.r_date
     @genres = movie.genres.split(",")
-    @runtime = movie.runtime.scan(/[0-9]/).join.to_i 
+    @runtime = movie.runtime.to_i 
     @rating = movie.rating
     @director = movie.director
     @actors = movie.actors.split(",")
-    return
   end
   def to_s
-  "\"#{@title}\", #{@rating}, #{@director}, #{@r_date}, #{@runtime}, #{@country}, genres: #{@genres.join(", ")}, stars: #{@actors.join(", ")}"
+  "\"#{@title}\", #{@rating}, #{@director}, #{@r_year}, #{@r_date}, #{@runtime}, #{@country}, genres: #{@genres.join(", ")}, stars: #{@actors.join(", ")}"
   end
   def has_genre?(genre)
-    if @genres.include? genre 
-      true
-    elsif !@movies_collection.filter(genres: genre).count.zero?
-      false
-    else
+    if @movies_collection.filter(genres: genre).count.zero?
       raise "Wrong the genre - \"#{genre}\" in \"has_genre\" method's parameter!"
-    end  
+    end
+    @genres.include? genre
+  end
+  def month
+     if !@r_date.count('-').zero?
+      Date::MONTHNAMES[Date.strptime(@r_date,"%Y-%m").month]
+     end                 
+  end
+  def has_key?(value,key) 
+    if Array === self.send(value) 
+        self.send(value).map {|obj| key === obj}.any?
+    else
+      (Range === key)? key === self.send(value).to_i : key === self.send(value)
+    end
   end
   def attrs
     ATTRIBUTES

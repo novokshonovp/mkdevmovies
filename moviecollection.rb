@@ -14,26 +14,21 @@ class MovieCollection < Movie
   def all
     @movies
   end
-  def sort_by(sortKey)
-    if sortKey == :director
-       @movies.sort {|x,y| x.director.split.last <=> y.director.split.last }
+  def sort_by(sort_key)
+    if sort_key == :director
+       @movies.sort_by {|x| x.director.split.last}
     else
-       @movies.sort {|x,y| x.send(sortKey) <=> y.send(sortKey) }   
-    end   
+       @movies.sort_by {|x| x.send(sort_key) }   
+    end    
   end
-  def filter(filterKey)
-      @movies.select {|movie| movie.send(filterKey.keys.first).include? filterKey.values.first }
+  
+  def filter(*filter_keys)
+      @movies.select {|movie|  filter_keys.first.map { | value , key | movie.has_key?(value,key)}.any? }
   end
-  def stats(statKey)
-  case statKey
-    when :actors, :genres
-          @movies.each_with_object(Hash.new(0)){ |movie,stats| movie.send(statKey).each{|actor| stats[actor]+=1 } }  
-    when :month
-          @movies
-          .reject{ |movie| movie.r_date.count('-').zero? }
-          .each_with_object(Hash.new(0)){ |movie,stats| stats[Date.strptime(movie.r_date,"%Y-%m").strftime("%B")]+=1 }   
-    else
-          @movies.each_with_object(Hash.new(0)){ |movie,stats| stats[movie.send(statKey)]+=1 }
-    end
+  
+  def stats(stat_key)
+      @movies.flat_map {|obj| obj.send(stat_key)}
+                    .compact
+                    .each_with_object(Hash.new(0)){ |obj,stats|  stats[obj] += 1  }
   end
 end

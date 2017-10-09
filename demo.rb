@@ -32,7 +32,7 @@ puts "\nFirst #{NUMBER_OF_RESULTS} results of \"filter\"  method"
 puts movies.filter(actors: 'Harrison Ford').first(NUMBER_OF_RESULTS)
 
 
-TEST_ATTR = [:director, :actors, :r_year, :month, :country, :genres]
+TEST_ATTR = %i[ director actors r_year month country genres]
 TEST_ATTR.each { |test_key| 
   puts "\nFirst #{NUMBER_OF_RESULTS} results of \"stats\"  method by \"#{test_key}\" key"
   movies.stats(test_key)      
@@ -55,4 +55,8 @@ test_genre.each { |test_key|
                     end }
 
 
-
+puts movies.filter(actors: /De Niro/, title: /Star/ , r_year: 1991..1993)           
+   
+    
+                    
+                    
