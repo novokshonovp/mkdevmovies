@@ -22,8 +22,8 @@ class MovieCollection < Movie
     end    
   end
   
-  def filter(*filter_keys)
-      @movies.select {|movie|  filter_keys.first.map { | value , key | movie.has_key?(value,key)}.any? }
+  def filter(**filter_keys)
+      @movies.select {|movie|  filter_keys.all? { | value , key | movie.has_key?(value,key)} }
   end
   
   def stats(stat_key)

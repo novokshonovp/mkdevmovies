@@ -55,8 +55,8 @@ test_genre.each { |test_key|
                     end }
 
 
-puts movies.filter(actors: /De Niro/, title: /Star/ , r_year: 1991..1993)           
-   
+ puts movies.filter(actors: /De Niro/, title: /God/, r_year: 1974)           
+           
     
                     
                     

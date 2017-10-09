@@ -5,7 +5,7 @@
     @movies_collection =  movie_collection
     @link = movie.link
     @title = movie.title
-    @r_year = movie.r_year
+    @r_year = movie.r_year.to_i
     @country = movie.country
     @r_date = movie.r_date
     @genres = movie.genres.split(",")
@@ -32,7 +32,7 @@
     if Array === self.send(value) 
         self.send(value).map {|obj| key === obj}.any?
     else
-      (Range === key)? key === self.send(value).to_i : key === self.send(value)
+      key === self.send(value)
     end
   end
   def attrs
