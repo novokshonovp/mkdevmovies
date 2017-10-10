@@ -28,11 +28,11 @@
       Date::MONTHNAMES[Date.strptime(@r_date,"%Y-%m").month]
      end                 
   end
-  def has_key?(value,key) 
-    if Array === self.send(value) 
-        self.send(value).map {|obj| key === obj}.any?
+  def matches?(field,filter) 
+    if Array === self.send(field) 
+        self.send(field).any? {|obj| filter === obj}
     else
-      key === self.send(value)
+      filter === self.send(field)
     end
   end
   def attrs
