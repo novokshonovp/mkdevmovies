@@ -27,8 +27,8 @@ class MovieCollection < Movie
       @movies.select {|movie|  filters.all? { | field , filter_key | movie.matches?(field,filter_key)} }
   end
   
-  def stats(stat_key)
-      @movies.flat_map {|obj| obj.send(stat_key)}
+  def stats(field)
+      @movies.flat_map {|obj| obj.send(field)}
                     .compact
                     .each_with_object(Hash.new(0)){ |obj,stats|  stats[obj] += 1  }
   end
