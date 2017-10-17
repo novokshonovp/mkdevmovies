@@ -2,15 +2,20 @@ require 'zip'
 require 'csv'
 require 'ostruct'
 require 'date'
+require_relative 'movie'
 
 class MovieCollection < Movie
   DATA_STRUCTURE = %i[link title r_year country r_date genres runtime rating director actors]
-  
+  PERIODS = {AncientMovie: 1900..1945, ClassicMovie: 1946..1968, ModernMovie: 1969..2000, NewMovie: 2001..Date.today.year}
+
   attr_reader :movies
   
   def initialize(filename_zip, filename_txt)
-    zip_file = Zip::File.new(DEFS[:filename_zip]).read(DEFS[:filename_txt])
-    @movies = CSV.parse(zip_file,:col_sep=>"|",:headers=>DATA_STRUCTURE).map{ |i| Movie.new(OpenStruct.new(i.to_h),self) }
+    zip_file = Zip::File.new(filename_zip).read(filename_txt)
+    @movies = CSV.parse(zip_file,:col_sep=>"|",:headers=>DATA_STRUCTURE).map{ |i| 
+              @movie = OpenStruct.new(i.to_h)
+              @classname = MovieCollection::PERIODS.map {|movie_type, period| movie_type.to_s if period === @movie.r_year.to_i }.join
+              Object.const_get(@classname).new(@movie,self) }
   end
   def all
     @movies
@@ -25,11 +30,13 @@ class MovieCollection < Movie
   
   def filter(**filters)
       @movies.select {|movie|  filters.all? { | field , filter_key | movie.matches?(field,filter_key)} }
-  end
-  
+  end 
   def stats(field)
       @movies.flat_map {|obj| obj.send(field)}
                     .compact
                     .each_with_object(Hash.new(0)){ |obj,stats|  stats[obj] += 1  }
+  end
+  def genres
+    @movies.flat_map{|field| field.genres }.uniq
   end
 end
