@@ -17,10 +17,10 @@ end
 
 netflix = Netflix.new(filename_zip,DEFS[:filename_txt])
 netflix.pay(10)
-puts netflix.show(period: "AncientMovie")
-theatre = Theatre.new(filename_zip,DEFS[:filename_txt])
-puts theatre.show("23:59")
-puts theatre.when?("Laura")
-puts theatre.when?("The Terminator")
+netflix.show(period: "AncientMovie")
+#theatre = Theatre.new(filename_zip,DEFS[:filename_txt])#theatre.show("06:59")
+#puts theatre.when?("Star Wars: Episode VI - Return of the Jedi")
+#puts theatre.when?("The Terminator")
+
 
 

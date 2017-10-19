@@ -1,30 +1,22 @@
 require_relative "cinema"
 require 'time'
 class Theatre < Cinema
-  SCHEDULE_PERIODS = {AncientMovie: 6..12}
-  SCHEDULE_GENRES= { Comedy: 12..18, Adventure: 12..18, Drama: 18..24, Horror: 18..24}
-   def initialize (filename_zip, filename_txt)
-    super(filename_zip, filename_txt)
-  end
-  
+  SCHEDULE = {6..12 => {genres: ["Comedy","Adventure"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Drama","Horror"]}}
+ 
   def show(time)
-    the_time = Time.parse(time)
-    if SCHEDULE_PERIODS.any?{ |key,value| value === the_time.hour }
-      filter_name = SCHEDULE_PERIODS.select{ |key,value| value === the_time.hour }.keys
-      movies = self.filter(period: (Regexp.new filter_name.join("|")))
-    elsif SCHEDULE_GENRES.any?{ |key,value| value === the_time.hour }
-      filter_name = SCHEDULE_GENRES.select{ |key,value| value === the_time.hour }.keys
-      movies = self.filter(genres: (Regexp.new filter_name.join("|")))
-    else
-       raise "Cinema closed!"
-    end
-    super(movies.sort_by { |movie| rand * movie.rating.to_i }.first.title)  
+    the_time = Time.parse(time) 
+    raise "Cinema closed!" if !SCHEDULE.any?{|key, value| key === the_time.hour} 
+    movies = Array.new
+    SCHEDULE.select{|time, filter| time === the_time.hour}.values.first.each{|key,value| 
+                     movies += self.filter((key.to_sym) => (Regexp.new value.join("|"))) }
+    super(movies.sort_by { |movie| rand * movie.rating.to_i }.first.title, the_time)  
   end
   
   def when?(title)      
-      schedule = (SCHEDULE_PERIODS.select {|key,value| key.to_s === self.filter(title: title).first.period}.values +
-                  SCHEDULE_GENRES.select {|key,value| self.filter(title: title).first.genres.any?{|genre| genre==key.to_s}}.values).uniq.join(',')
-       raise "No schedule for #{title}!" if schedule.empty? 
-       "#{title}: " + schedule
+      schedule = SCHEDULE.select{|time, filter| filter.any?{|key,value| 
+                                                              !self.filter(title: title).first.send(key).is_a?(Array) ?  movie_field = self.filter(title: title).first.send(key).to_s.split : 
+                                                                                                           movie_field = self.filter(title: title).first.send(key)  
+                                                              (movie_field & value).any? }}
+      schedule.empty? ? (raise "No schedule for #{title}!") : "#{title}: " + schedule.keys.join(",")
   end
 end

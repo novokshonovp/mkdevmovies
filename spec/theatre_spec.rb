@@ -5,16 +5,23 @@ describe Theatre do
   let(:theatre) {  Theatre.new("movies.txt.zip","movies.txt") }
  
   describe "#show" do
-    subject {theatre.show(time)}
-    let(:time) { "10:30" } 
-    context "when not enough money" do
-      it { expect{ subject }.to raise_error "Not enough money!" }
-    end
-    context "when enough money" do
-      let!(:pay){theatre.pay(100)}
-      it { is_expected.to include("Now showing") }
-      it { expect{ subject }.to change   {theatre.balance} }  
-    end    
+      context "when open" do
+        arguments = {morning: "9:30", afternoon: "12:45", night: "21:00"}
+        stdout = StringIO.new
+        $stdout = stdout
+        arguments.each{|day_time,time|
+                      it "should show a movie  in the #{day_time}" do
+                        theatre.show(time)
+                        expect($stdout.string.split("\n").count{|movie| 
+                                movie.include?($stdout.string.split("\n").last[0..-16]) }).to eq(1)
+                      end
+                      }
+      end
+      context "when closed" do
+        subject {theatre.show(time)}
+        let(:time) { "00:01" } 
+        it { expect{ subject }.to raise_error "Cinema closed!"  }
+      end   
   end
   
   describe "#when?" do
