@@ -1,7 +1,7 @@
 require_relative "cinema"
 require 'time'
 class Theatre < Cinema
-  SCHEDULE = {6..12 => {genres: ["Comedy","Adventure"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Drama","Horror"]}}
+  SCHEDULE = {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Drama","Horror"]}}
  
   def show(time)
     the_time = Time.parse(time) 
@@ -9,7 +9,7 @@ class Theatre < Cinema
     movies = Array.new
     SCHEDULE.select{|time, filter| time === the_time.hour}.values.first.each{|key,value| 
                      movies += self.filter((key.to_sym) => (Regexp.new value.join("|"))) }
-    super(movies.sort_by { |movie| rand * movie.rating.to_i }.first.title, the_time)  
+    super(movies.sort_by { |movie| rand * movie.rating.to_i }.first, the_time)  
   end
   
   def when?(title)      
