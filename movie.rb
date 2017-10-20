@@ -1,4 +1,6 @@
  class Movie
+ require_relative 'movie_children'
+  PERIODS = {1900..1945 => AncientMovie, 1946..1968 => ClassicMovie, 1969..2000 => ModernMovie, 2001..Date.today.year => NewMovie }
   ATTRIBUTES = %i[ link title r_year country r_date genres runtime rating director actors period]
   attr_reader *ATTRIBUTES
   def initialize(movie,movie_collection)
@@ -13,6 +15,9 @@
     @rating = movie.rating
     @director = movie.director
     @actors = movie.actors.split(",")
+  end
+  def create(movie)
+    PERIODS.select{|period, movie_type| period === movie.r_year.to_i }.values.first.new(movie,self)
   end
   def to_s
   "\"#{@title}\", #{@rating}, #{@director}, #{@r_year}, #{@r_date}, #{@runtime}, #{@country}, genres: #{@genres.join(", ")}, stars: #{@actors.join(", ")}"
@@ -32,35 +37,14 @@
      end                 
   end
   def matches?(field,filter) 
-    if self.send(field).is_a?(Array)
-        self.send(field).any? {|obj| filter === obj}
+    movie_field = self.send(field)
+    if movie_field.is_a?(Array)
+        movie_field.any? {|obj| filter === obj}
     else
-      filter === self.send(field)
+      filter === movie_field
     end
   end
   def attrs
     ATTRIBUTES
-  end
-end
-class AncientMovie < Movie
-  def to_s
-    "<<#{@title} - Ancient movie (#{@r_year}).>>"
-  end
-end
-class ClassicMovie < Movie
-  def to_s
-    @films = @movies_collection.filter(director: @director).map{|movie| movie.title} 
-    @films.delete(@title)
-    "<<#{@title} - Classic movie, director: #{@director}#{('('+@films.join(', ')+')') if @films.count>0}.>>"
-  end
-end
-class ModernMovie < Movie
-  def to_s
-    "<<#{@title} - Modern movie, stars: #{@actors.join(', ')}.>>"
-  end
-end
-class NewMovie < Movie
-  def to_s
-    "<<#{@title} - New movie, released #{Date.today.year-@r_year} years ago.>>"
   end
 end

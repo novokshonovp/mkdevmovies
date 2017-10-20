@@ -1,27 +1,25 @@
 require './netflix'
 
-describe Netflix do
-    
+describe Netflix do  
   let(:netflix) {  Netflix.new("movies.txt.zip","movies.txt") }
-  subject {netflix.show(filters)} 
-  
+
   describe "#show" do
     let(:filters) { {title: "The Terminator"} }
-    
+    subject {netflix.show(filters)} 
     context "when not enough money" do
       it { expect{ subject }.to raise_error "Not enough money!" }
     end
     context "when enough money" do
         let!(:pay){netflix.pay(100)}
-        it { is_expected.to include("Now showing") }
-        it { expect{ subject }.to change   {netflix.balance}.by(-3) }  
+        it { expect { subject }.to output(/Now showing/).to_stdout }
+        it { expect{ subject }.to change(netflix, :balance).by(-3) }  
       context "when movie not exist" do
         let(:filters) { {title: "Non existant movie"} }
         it { expect{ subject }.to raise_error "No movies found!" }
       end
       context "with right params" do
         let(:filters) { {genres: "Comedy",period: "AncientMovie"}  }
-        it { expect(subject).to include("Now showing") } 
+        it { expect{subject}.to output(/Now showing/).to_stdout } 
       end
       context "with wrong params" do
         let(:filters) { {genre: "Comedy"}}
