@@ -11,7 +11,7 @@ class MovieCollection < Movie
   def initialize(filename_zip, filename_txt)
     zip_file = Zip::File.new(filename_zip).read(filename_txt)
     @movies = CSV.parse(zip_file,:col_sep=>"|",:headers=>DATA_STRUCTURE).map{ |i| 
-             self.create(OpenStruct.new(i.to_h))}
+                      create(OpenStruct.new(i.to_h))}
   end
   def all
     @movies

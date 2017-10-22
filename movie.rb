@@ -17,7 +17,7 @@
     @actors = movie.actors.split(",")
   end
   def create(movie)
-    PERIODS.select{|period, movie_type| period === movie.r_year.to_i }.values.first.new(movie,self)
+    PERIODS.detect{|period, movie_class| period.cover?(movie.r_year.to_i) }.last.new(movie,self)
   end
   def to_s
   "\"#{@title}\", #{@rating}, #{@director}, #{@r_year}, #{@r_date}, #{@runtime}, #{@country}, genres: #{@genres.join(", ")}, stars: #{@actors.join(", ")}"
@@ -37,7 +37,7 @@
      end                 
   end
   def matches?(field,filter) 
-    movie_field = self.send(field)
+    movie_field = send(field)
     if movie_field.is_a?(Array)
         movie_field.any? {|obj| filter === obj}
     else
