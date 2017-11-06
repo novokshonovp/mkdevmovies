@@ -1,35 +1,26 @@
 require './theatre'
 
 describe Theatre do  
-  let(:theatre) {  Theatre.new("movies.txt.zip","movies.txt") }
-  let(:movie) { Movie.new(OpenStruct.new({:link=>"http://imdb.com/title/tt0118799/?ref_=chttp_tt_26", 
-                                              :title=>"Life Is Beautiful", :r_year=>"1997", 
-                                              :country=>"Italy", :r_date=>"1999-02-12", 
-                                              :genres=>"Comedy,Drama,Romance", :runtime=>"116 min", 
-                                              :rating=>"8.6", :director=>"Roberto Benigni", 
-                                              :actors=>"Roberto Benigni,Nicoletta Braschi,Giorgio Cantarini"}), 
-                                              theatre)}
+  let(:theatre) {  Theatre.new("./spec/test_movies.txt.zip","movies.txt") }
+  let(:test_schedule) { {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Horror"]}} }
   describe "#show" do
       subject {theatre.show(time)}
-      context "when open" do
-        let(:time) { "10:30" } 
-        it "shows in HD" do
-          expect{subject}.to output(/^<<Now showing/).to_stdout && output(/>>$/).to_stdout &&
-                             output(/[0-9][0-9]:[0-5][0-9] - [0-9][0-9]:[0-5][0-9]/).to_stdout
-        end
+      context "when open" do 
+      before { allow(theatre).to receive(:schedule).and_return(test_schedule) }
         context "when in the morning" do
-        before { expect(theatre).to receive(:filter).with(period: /AncientMovie/).and_return([movie]) }
           let(:time) { "10:30" } 
-          it  { expect{subject}.to output(/Now showing/).to_stdout }
+          it { expect{subject}.to output("<<Now showing Casablanca 10:30 - 12:12>>\n").to_stdout  } 
+        end
+        context "when in the afternoon" do
+          let(:time) { "13:30" }
+          it  { expect{subject}.to output("<<Now showing Interstellar 13:30 - 16:19>>\n").to_stdout }
         end
         context "when at night" do
-        before { expect(theatre).to receive(:filter).with(genres: /Drama|Horror/).and_return([movie])}
           let(:time) { "21:30" } 
-          it  { expect{subject}.to output(/Now showing/).to_stdout }
+          it  { expect{subject}.to output("<<Now showing Psycho 21:30 - 23:19>>\n").to_stdout }
         end
       end
       context "when closed" do
-        subject {theatre.show(time)}
         let(:time) { "00:01" } 
         it { expect{ subject }.to raise_error "Cinema closed!"  }
       end   
@@ -42,7 +33,7 @@ describe Theatre do
       it { expect{subject}.to raise_error "No schedule for #{title}!" }
     end
     context "when scheduled" do
-      let(:title) {"Laura"} 
+      let(:title) {"Casablanca"} 
       it { is_expected.to include(title) }   end
   end
 end

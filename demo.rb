@@ -11,16 +11,15 @@ if ARGV.length<1
     filename_zip = DEFS[:filename_zip]
 end
 if !File.exist?(filename_zip)
-    puts "File #{filename} doesn't exist. Use the default #{DEFS[:filename_zip]}."
+    puts "File #{filename_zip} doesn't exist. Use the default #{DEFS[:filename_zip]}."
     filename_zip = DEFS[:filename_zip]
 end
 
 netflix = Netflix.new(filename_zip,DEFS[:filename_txt])
 netflix.pay(10)
-netflix.show(period: "AncientMovie")
+netflix.show(title: "The Terminator")
 theatre = Theatre.new(filename_zip,DEFS[:filename_txt])
-theatre.show("13:30")
+theatre.show("10:30")
+puts theatre.when?("Casablanca")
 puts theatre.when?("Star Wars: Episode VI - Return of the Jedi")
 puts theatre.when?("The Terminator")
-
-

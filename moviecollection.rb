@@ -1,7 +1,6 @@
 require 'zip'
 require 'csv'
 require 'ostruct'
-require 'date'
 require_relative 'movie'
 
 class MovieCollection < Movie
@@ -25,7 +24,9 @@ class MovieCollection < Movie
   end
   
   def filter(**filters)
-      @movies.select {|movie|  filters.all? { | field , filter_key | movie.matches?(field,filter_key)} }
+      movies = @movies.select {|movie|  filters.all? { | field , filter_key | movie.matches?(field,filter_key)} }
+      raise "Wrong filter options. No movie in the database!" if movies.empty?
+      movies
   end 
   def stats(field)
       @movies.flat_map {|obj| obj.send(field)}

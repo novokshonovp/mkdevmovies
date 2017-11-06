@@ -16,7 +16,6 @@ class Netflix < Cinema
   def show(**filters) 
     raise "Wrong filter params!" if !filters.keys.all?{ |filter_name| attrs.include?(filter_name) } 
     movies = filter(filters)
-    raise "No movies found!" if movies.empty?
     movie_to_show = mix(movies).first
     raise "Not enough money!"if @balance< how_much?(movie_to_show.title)
     @balance-= how_much?(movie_to_show.title)
