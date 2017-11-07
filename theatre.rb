@@ -1,22 +1,20 @@
 require_relative "cinema"
 require 'time'
 class Theatre < Cinema
-  SCHEDULE = {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Drama","Horror"]}}
- 
+  SCHEDULE = {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Drama","Horror"]}} 
+  SCHEDULE_INTERNAL = SCHEDULE.transform_values{|filter| filter.transform_values(&Regexp.method(:union)) }
   def show(time)
     the_time = Time.parse(time) 
-    raise "Cinema closed!" if !SCHEDULE.any?{|key, value| key === the_time.hour} 
-    movies = Array.new
-    SCHEDULE.select{|time, filter| time === the_time.hour}.values.first.each{|key,value| 
-                     movies += self.filter((key.to_sym) => (Regexp.new value.join("|"))) }
-    super(movies.sort_by { |movie| rand * movie.rating.to_i }.first, the_time)  
+    _, filters = SCHEDULE_INTERNAL.detect{ |time, _| time.cover?(the_time.hour) }
+    raise "Cinema closed!" if filters.nil?
+    movies = filter(filters)
+    super(mix(movies).first,the_time)  
   end
   
-  def when?(title)      
-      schedule = SCHEDULE.select{|time, filter| filter.any?{|key,value| 
-                                                              !self.filter(title: title).first.send(key).is_a?(Array) ?  movie_field = self.filter(title: title).first.send(key).to_s.split : 
-                                                                                                           movie_field = self.filter(title: title).first.send(key)  
-                                                              (movie_field & value).any? }}
+  def when?(title)    
+      movie  = filter(title: title).first
+      schedule = SCHEDULE_INTERNAL.select{|time, filter| filter.all?{|key,value| 
+                                                              movie.matches?(key,value) }}  
       schedule.empty? ? (raise "No schedule for #{title}!") : "#{title}: " + schedule.keys.join(",")
   end
 end

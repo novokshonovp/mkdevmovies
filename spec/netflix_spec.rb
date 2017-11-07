@@ -10,12 +10,15 @@ describe Netflix do
       it { expect{ subject }.to raise_error "Not enough money!" }
     end
     context "when enough money" do
-        let!(:pay){netflix.pay(100)}
-        it { expect { subject }.to output(/Now showing/).to_stdout }
+        let!(:pay){ netflix.pay(100) }
+        let(:terminator_runtime) { 107 }
+        let(:show_output) { time = Time.now
+                            "<<Now showing The Terminator #{time.strftime("%H:%M")} - #{(time + terminator_runtime*60).strftime("%H:%M")}>>\n"}
+        it { expect { subject }.to output(show_output).to_stdout }
         it { expect{ subject }.to change(netflix, :balance).by(-3) }  
       context "when movie not exist" do
         let(:filters) { {title: "Non existant movie"} }
-        it { expect{ subject }.to raise_error "No movies found!" }
+        it { expect{ subject }.to raise_error "Wrong filter options. No movie in the database!" }
       end
       context "with right params" do
         let(:filters) { {genres: "Comedy",period: "AncientMovie"}  }
