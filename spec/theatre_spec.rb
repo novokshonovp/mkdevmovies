@@ -2,11 +2,11 @@ require './theatre'
 
 describe Theatre do  
   let(:theatre) {  Theatre.new("./spec/test_movies.txt.zip","movies.txt") }
-  let(:test_schedule) { {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Horror"]}} }
+  let(:fake_schedule) { {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Horror"]}} } 
   describe "#show" do
       subject {theatre.show(time)}
       context "when open" do 
-      before { allow(theatre).to receive(:schedule).and_return(test_schedule) }
+      #before { allow(theatre).to receive(:schedule).and_return(test_schedule) }
         context "when in the morning" do
           let(:time) { "10:30" } 
           it { expect{subject}.to output("<<Now showing Casablanca 10:30 - 12:12>>\n").to_stdout  } 
@@ -17,7 +17,9 @@ describe Theatre do
         end
         context "when at night" do
           let(:time) { "21:30" } 
-          it  { expect{subject}.to output("<<Now showing Psycho 21:30 - 23:19>>\n").to_stdout }
+          it  { 
+                stub_const("Theatre::SCHEDULE_INTERNAL", fake_schedule.transform_values{ |filter| filter.transform_values(&Regexp.method(:union)) } )
+                expect{subject}.to output("<<Now showing Psycho 21:30 - 23:19>>\n").to_stdout }
         end
       end
       context "when closed" do

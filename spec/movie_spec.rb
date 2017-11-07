@@ -41,37 +41,29 @@ describe Movie do
       let(:genre) { "Adventure"}
       it {is_expected.to be false}
     end
+    context "when wrong genre" do
+      let(:genre) {"Wrong genre"}
+      it {expect{ subject }.to raise_error /Wrong filter options/ }
+    end
   end
   
-  describe "to create child instance" do
+  describe ".create" do
     subject { movie_collection.create(movie_ostruct) }
     context "when AncientMovie" do
       let(:movie_ostruct){ ancient_movie }
       it {expect(subject).to be_instance_of(AncientMovie)}    
-      it "format output" do
-        expect{puts subject}.to output("<<Casablanca - Ancient movie (1942).>>\n").to_stdout
-      end
     end
     context "when ClassicMovie" do
       let(:movie_ostruct){ classic_movie }
       it {expect(subject).to be_instance_of(ClassicMovie)}    
-      it "format output" do
-        expect{puts subject}.to output("<<12 Angry Men - Classic movie, director: Sidney Lumet(other 2 movies in the list).>>\n").to_stdout
-      end
     end    
     context "when ModernMovie" do
       let(:movie_ostruct){ modern_movie }
       it {expect(subject).to be_instance_of(ModernMovie)}
-      it "format output" do
-        expect{puts subject}.to output("<<The Shawshank Redemption - Modern movie, stars: Tim Robbins, Morgan Freeman, Bob Gunton.>>\n").to_stdout
-      end
     end
     context "when NewMovie" do
       let(:movie_ostruct){ new_movie }
       it {expect(subject).to be_instance_of(NewMovie)}   
-      it "format output" do
-        expect{puts subject}.to output("<<Interstellar - New movie, released 3 years ago.>>\n").to_stdout
-      end
     end
     context "when wrong period" do
       let(:movie_ostruct){ wrong_movie }

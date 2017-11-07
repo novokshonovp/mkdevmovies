@@ -30,10 +30,8 @@ require 'date'
   end
   
   def has_genre?(genre)
-    if @movies_collection.filter(genres: genre).count.zero?
-      raise "Wrong the genre - \"#{genre}\" in \"has_genre\" method's parameter!"
-    end
-    @genres.include? genre
+
+    @genres.include? genre if !@movies_collection.filter(genres: genre).count.zero?
   end
   
   def month
