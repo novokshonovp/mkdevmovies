@@ -35,15 +35,14 @@ describe MovieCollection do
      end
   end
   describe "#stats" do
-    subject {movie_collection.stats(field).sort_by {|key| key[1]}
-                             .reverse.first}
+    subject { movie_collection.stats(field) }
     context "when pass director" do
-      let(:field) {:director}
-      it {is_expected.to match_array(["Stanley Kubrick", 8])}
+      let(:field) { :director }
+      it { is_expected.to include('Stanley Kubrick' => 8)}
     end
      context "when pass r_year" do
       let(:field) {:r_year}
-      it {is_expected.to match_array([1995, 10])}
+      it { is_expected.to include(1995 => 10)}
     end   
   end
   

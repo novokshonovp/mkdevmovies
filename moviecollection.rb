@@ -3,14 +3,14 @@ require 'csv'
 require 'ostruct'
 require_relative 'movie'
 
-class MovieCollection < Movie
+class MovieCollection 
   DATA_STRUCTURE = %i[link title r_year country r_date genres runtime rating director actors]
   attr_reader :movies
   
   def initialize(filename_zip, filename_txt)
     zip_file = Zip::File.new(filename_zip).read(filename_txt)
     @movies = CSV.parse(zip_file,:col_sep=>"|",:headers=>DATA_STRUCTURE).map{ |i| 
-                      create(OpenStruct.new(i.to_h))}
+                      Movie::create(OpenStruct.new(i.to_h),self)}
   end
   def all
     @movies

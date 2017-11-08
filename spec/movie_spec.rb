@@ -1,8 +1,18 @@
 require './movie'
 require './moviecollection'
 require './spec/test_movie'
+
+shared_examples "create by year" do | year, movie_class_name |
+  subject { Movie::create(test_movie, nil) }
+  let(:test_movie){ wrong_movie.r_year = year 
+                    wrong_movie }
+  it { is_expected.to be_instance_of(movie_class_name) }
+end
+
+
 describe Movie do
   include_context 'create_test_movie' 
+  
   describe "#matches?" do
     subject {movie.matches?(field,filter)}
     context "when matches by string" do
@@ -48,23 +58,11 @@ describe Movie do
   end
   
   describe ".create" do
-    subject { movie_collection.create(movie_ostruct) }
-    context "when AncientMovie" do
-      let(:movie_ostruct){ ancient_movie }
-      it {expect(subject).to be_instance_of(AncientMovie)}    
-    end
-    context "when ClassicMovie" do
-      let(:movie_ostruct){ classic_movie }
-      it {expect(subject).to be_instance_of(ClassicMovie)}    
-    end    
-    context "when ModernMovie" do
-      let(:movie_ostruct){ modern_movie }
-      it {expect(subject).to be_instance_of(ModernMovie)}
-    end
-    context "when NewMovie" do
-      let(:movie_ostruct){ new_movie }
-      it {expect(subject).to be_instance_of(NewMovie)}   
-    end
+    subject { Movie::create(movie_ostruct, nil) }
+    it_behaves_like 'create by year', 1936, AncientMovie
+    it_behaves_like 'create by year', 1946, ClassicMovie
+    it_behaves_like 'create by year', 1970, ModernMovie
+    it_behaves_like 'create by year', 2010, NewMovie
     context "when wrong period" do
       let(:movie_ostruct){ wrong_movie }
       it { expect{ subject }.to raise_error "Wrong period to create movie!"}   

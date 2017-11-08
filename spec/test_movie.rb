@@ -2,9 +2,5 @@ require 'ostruct'
  shared_context 'create_test_movie' do
   let(:movie_collection) { MovieCollection.new("./movies.txt.zip","movies.txt")}
   let(:movie) { movie_collection.all.first}
-  let(:ancient_movie){ OpenStruct.new({link: "http://imdb.com/title/tt0034583/?ref_=chttp_tt_32", title: "Casablanca", r_year: "1942", country: "USA", r_date: "1943-01-23", genres: "Drama,Romance,War", runtime: "102 min", rating: "8.6", director: "Michael Curtiz", actors: "Humphrey Bogart,Ingrid Bergman,Paul Henreid"}) }
-  let(:classic_movie) { OpenStruct.new({link: "http://imdb.com/title/tt0050083/?ref_=chttp_tt_5", title: "12 Angry Men", r_year: "1957", country: "USA", r_date: "1957-04", genres: "Crime,Drama", runtime: "96 min", rating: "8.9", director: "Sidney Lumet", actors: "Henry Fonda,Lee J. Cobb,Martin Balsam"}) }
-  let(:modern_movie) { OpenStruct.new({link: "http://imdb.com/title/tt0111161/?ref_=chttp_tt_1", title: "The Shawshank Redemption", r_year: "1994", country: "USA", r_date: "1994-10-14", genres: "Crime,Drama", runtime: "142 min", rating: "9.3", director: "Frank Darabont", actors: "Tim Robbins,Morgan Freeman,Bob Gunton"}) }
-  let(:new_movie){ OpenStruct.new({link: "http://imdb.com/title/tt0816692/?ref_=chttp_tt_29", title: "Interstellar", r_year: "2014", country: "USA", r_date: "2014-11-07", genres: "Adventure,Drama,Sci-Fi", runtime: "169 min", rating: "8.7", director: "Christopher Nolan", actors: "Matthew McConaughey,Anne Hathaway,Jessica Chastain"})}
   let(:wrong_movie){ OpenStruct.new({link: "http://imdb.com/title/tt0816692/?ref_=chttp_tt_0", title: "Wrong test movie", r_year: "2022", country: "USA", r_date: "2022-11-07", genres: "Adventure,Drama,Sci-Fi", runtime: "169 min", rating: "8.7", director: "Christopher Nolan", actors: "Matthew McConaughey,Anne Hathaway,Jessica Chastain"})}
 end                                              

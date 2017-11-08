@@ -7,7 +7,7 @@ end
 class ClassicMovie < Movie
   def to_s
     films = @movies_collection.filter(director: @director) 
-    directors_movies_count_adds = '(other '+(films.count-1).to_s+' movies in the list)' if films.count>1
+    directors_movies_count_adds = "(other #{films.count-1} movies in the list)" if films.count>1
     "<<#{@title} - Classic movie, director: #{@director}#{directors_movies_count_adds}.>>"
   end
 end

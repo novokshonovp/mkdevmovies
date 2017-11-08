@@ -5,6 +5,7 @@ require 'date'
   PERIODS = {1900..1945 => AncientMovie, 1946..1968 => ClassicMovie, 1969..2000 => ModernMovie, 2001..Date.today.year => NewMovie }
   ATTRIBUTES = %i[ link title r_year country r_date genres runtime rating director actors period]
   attr_reader *ATTRIBUTES
+  
   def initialize(movie,movie_collection)
     @movies_collection =  movie_collection
     @link = movie.link
@@ -18,10 +19,12 @@ require 'date'
     @director = movie.director
     @actors = movie.actors.split(",")
   end
-  def create(movie)
+  
+  def self.create(movie, movie_collection)
     raise "Wrong period to create movie!" if PERIODS.detect{|period, movie_class| period.cover?(movie.r_year.to_i) }.nil?
-    PERIODS.detect{|period, movie_class| period.cover?(movie.r_year.to_i) }.last.new(movie,self)
+    PERIODS.detect{|period, movie_class| period.cover?(movie.r_year.to_i) }.last.new(movie, movie_collection)
   end
+  
   def to_s
   "\"#{@title}\", #{@rating}, #{@director}, #{@r_year}, #{@r_date}, #{@runtime}, #{@country}, genres: #{@genres.join(", ")}, stars: #{@actors.join(", ")}"
   end
@@ -30,7 +33,6 @@ require 'date'
   end
   
   def has_genre?(genre)
-
     @genres.include? genre if !@movies_collection.filter(genres: genre).count.zero?
   end
   

@@ -7,14 +7,13 @@ class Netflix < Cinema
     super(filename_zip, filename_txt)
   end
   def pay(amount)
-    raise "Amount should be positive!"  if amount<0.01 
+    raise "Amount should be positive!"  if amount<=0
     @balance+=amount
   end 
   def how_much?(title)
-    PRICES[filter(title: title).first.class.to_s.to_sym]
+    PRICES[filter(title: title).first.period.to_sym]
   end
   def show(**filters) 
-    raise "Wrong filter params!" if !filters.keys.all?{ |filter_name| attrs.include?(filter_name) } 
     movies = filter(filters)
     movie_to_show = mix(movies).first
     raise "Not enough money!"if @balance< how_much?(movie_to_show.title)

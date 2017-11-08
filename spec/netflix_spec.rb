@@ -10,23 +10,20 @@ describe Netflix do
       it { expect{ subject }.to raise_error "Not enough money!" }
     end
     context "when enough money" do
-        let!(:pay){ netflix.pay(100) }
+        before { netflix.pay(100) 
+                 @time_now = Time.now
+                 allow(Time).to receive(:now).and_return(@time_now) }
         let(:terminator_runtime) { 107 }
-        let(:show_output) { time = Time.now
-                            "<<Now showing The Terminator #{time.strftime("%H:%M")} - #{(time + terminator_runtime*60).strftime("%H:%M")}>>\n"}
+        let(:show_output) { "<<Now showing The Terminator #{@time_now.strftime("%H:%M")} - #{(@time_now + terminator_runtime*60).strftime("%H:%M")}>>\n"}
         it { expect { subject }.to output(show_output).to_stdout }
         it { expect{ subject }.to change(netflix, :balance).by(-3) }  
       context "when movie not exist" do
         let(:filters) { {title: "Non existant movie"} }
         it { expect{ subject }.to raise_error "Wrong filter options. No movie in the database!" }
       end
-      context "with right params" do
-        let(:filters) { {genres: "Comedy",period: "AncientMovie"}  }
-        it { expect{subject}.to output(/Now showing/).to_stdout } 
-      end
       context "with wrong params" do
         let(:filters) { {genre: "Comedy"}}
-        it { expect{ subject }.to raise_error "Wrong filter params!" }
+        it { expect{ subject }.to raise_error "Doesn't have field \"#{filters.keys.first}\"!" }
       end
     end
   end
@@ -44,6 +41,6 @@ describe Netflix do
   end
   
   describe "#how_much?" do
-    it { expect(netflix.how_much?("The Terminator")).to be == 3 }
+    it { expect(netflix.how_much?("The Terminator")).to eq 3 }
   end
 end
