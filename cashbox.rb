@@ -13,7 +13,7 @@ module CashBox
   
   def put_cash(amount)
     raise "Amount should be positive!" if amount<=0
-    @balance = balance.nil? ? Money.new(0, :USD) : @balance+Money.from_amount(amount, :USD)
+    @balance = balance.nil? ? Money.from_amount(amount, :USD) : @balance+Money.from_amount(amount, :USD)
   end
   
   def take(who)

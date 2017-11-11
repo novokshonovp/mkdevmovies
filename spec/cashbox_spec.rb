@@ -1,11 +1,10 @@
 require './cashbox'
 require 'money'
 
-class DummyTheatre
-  include CashBox 
-end
+
 describe CashBox do
-  let(:cash_box) { DummyTheatre.new }
+  let(:dummytheatre) { Class.new { include CashBox} }
+  let(:cash_box) { cash_box = dummytheatre.new }
 
   describe "#put_cash" do
     subject { cash_box.put_cash(amount) }
@@ -15,21 +14,20 @@ describe CashBox do
     end
     context "when positive" do
       let(:amount) { 3.55 }
-      it { expect{ subject }.to change{ cash_box.cash.amount }.by(amount) }
+      it { expect{ subject }.to change(cash_box, :cash).by(Money.from_amount(amount, :USD)) }
     end
   end
 
   describe ".take" do
+    before { cash_box.put_cash(balance) }
+    subject { cash_box.take(who) }
+    let(:balance) { 155.12 }    
     context "when bank" do
-      before { cash_box.put_cash(balance) }
-      subject { cash_box.take(who) }
       let(:who) { "Bank" }
-      let(:balance) { 155.12 }
       it { expect{ subject }.to  output("Cash withdrawn. #{Money.from_amount(balance,:USD).format}\n").to_stdout }
-      it { expect{ subject }.to  change{ cash_box.cash.amount }.to(Money.new(0, :USD)) }
+      it { expect{ subject }.to  change(cash_box, :cash).to(Money.new(0, :USD)) }
     end
     context "when alarm" do
-      subject{ cash_box.take(who) }
       let(:who) { "thief" }
       it { expect{ subject }.to  raise_error "Police!" }
     end

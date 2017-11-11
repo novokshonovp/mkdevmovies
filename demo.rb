@@ -1,6 +1,5 @@
-
-require_relative 'netflix'
-require_relative 'theatre'
+require_relative 'mkdevmovies'
+include MkdevMovies
 
 DEFS = {filename_zip: "movies.txt.zip", 
             filename_txt: "movies.txt"}
@@ -27,4 +26,3 @@ puts Netflix.cash
 theatre = Theatre.new(filename_zip,DEFS[:filename_txt])
 theatre.buy_ticket("10:05")
 puts theatre.cash
-
