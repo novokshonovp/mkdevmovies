@@ -1,4 +1,5 @@
 require './netflix'
+require 'money'
 
 describe Netflix do  
   let(:netflix) {  Netflix.new("movies.txt.zip","movies.txt") }
@@ -14,9 +15,10 @@ describe Netflix do
                  @time_now = Time.now
                  allow(Time).to receive(:now).and_return(@time_now) }
         let(:terminator_runtime) { 107 }
+        let(:film_price) { Money.from_amount(3, :USD) }
         let(:show_output) { "<<Now showing The Terminator #{@time_now.strftime("%H:%M")} - #{(@time_now + terminator_runtime*60).strftime("%H:%M")}>>\n"}
         it { expect { subject }.to output(show_output).to_stdout }
-        it { expect{ subject }.to change(netflix, :balance).by(-3) }  
+        it { expect{ subject }.to change(netflix, :user_balance).by(-film_price) }  
       context "when movie not exist" do
         let(:filters) { {title: "Non existant movie"} }
         it { expect{ subject }.to raise_error "Wrong filter options. No movie in the database!" }
@@ -29,18 +31,21 @@ describe Netflix do
   end
   
   describe "#pay" do
-    subject {netflix.pay(amount)}
     context 'when amount positive' do
-      let(:amount) { 25 }
-      it { expect{ subject }.to change { netflix.balance }.by(amount) }
+      subject {netflix.pay(amount.amount)}
+      let(:amount) { Money.from_amount(25, :USD) }
+      it { expect{ subject }.to change(netflix, :user_balance).by(amount) }
+      it { expect{ subject }.to change(Netflix, :cash).by(amount) }
     end
     context 'when amount negative' do
+      subject {netflix.pay(amount)}
       let(:amount) { -25 }
       it { expect { subject }.to raise_error "Amount should be positive!" }
     end
   end
   
   describe "#how_much?" do
-    it { expect(netflix.how_much?("The Terminator")).to eq 3 }
+    let(:film_price) { Money.from_amount(3, :USD) }
+    it { expect(netflix.how_much?("The Terminator")).to eq film_price }
   end
 end

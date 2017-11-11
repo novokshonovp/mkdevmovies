@@ -1,5 +1,9 @@
 require './theatre'
 
+shared_examples "deposit to cashbox" do | amount|
+  it { expect{ subject }.to change { theatre.cash.amount }.by(amount) }
+end
+
 describe Theatre do  
   let(:theatre) {  Theatre.new("./spec/test_movies.txt.zip","movies.txt") }
   let(:fake_schedule) { {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Horror"]}}
@@ -16,7 +20,7 @@ describe Theatre do
           it  { expect{subject}.to output("<<Now showing Interstellar 13:30 - 16:19>>\n").to_stdout }
         end
         context "when at night" do
-        before { stub_const("Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
+          before { stub_const("Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
           let(:time) { "21:30" } 
           it { expect{subject}.to output("<<Now showing Psycho 21:30 - 23:19>>\n").to_stdout }
         end
@@ -36,5 +40,25 @@ describe Theatre do
     context "when scheduled" do
       let(:title) {"Casablanca"} 
       it { is_expected.to include(title) }   end
+  end
+  
+  describe "#buy_ticket" do
+    subject {theatre.buy_ticket(time)}
+    context "when in the morning" do 
+      let(:time) { "10:05"}
+      it { expect{ subject }.to output("You bought the $3.00 ticket for Casablanca.\n").to_stdout }
+      it_behaves_like 'deposit to cashbox', 3
+    end
+    context "when in the afternoon" do
+      let(:time) { "14:05"}
+      it { expect{ subject }.to output("You bought the $5.00 ticket for Interstellar.\n").to_stdout }
+      it_behaves_like 'deposit to cashbox', 5
+    end
+    context "when at night" do
+      before { stub_const("Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
+      let(:time) { "22:05"}
+      it { expect{ subject }.to output("You bought the $10.00 ticket for Psycho.\n").to_stdout }
+      it_behaves_like 'deposit to cashbox', 10 
+    end   
   end
 end
