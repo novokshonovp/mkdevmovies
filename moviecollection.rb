@@ -4,6 +4,7 @@ require 'ostruct'
 require_relative 'movie'
 
 class MovieCollection 
+  include Enumerable 
   DATA_STRUCTURE = %i[link title r_year country r_date genres runtime rating director actors]
   attr_reader :movies
   
@@ -33,7 +34,12 @@ class MovieCollection
                     .compact
                     .each_with_object(Hash.new(0)){ |obj,stats|  stats[obj] += 1  }
   end
+  
   def genres
     @movies.flat_map{|field| field.genres }.uniq
+  end
+  
+  def each(&block)
+    @movies.each(&block)
   end
 end
