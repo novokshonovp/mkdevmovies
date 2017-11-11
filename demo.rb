@@ -1,4 +1,5 @@
-require_relative 'mkdevmovies'
+require_relative 'netflix'
+require_relative 'theatre'
 include MkdevMovies
 
 DEFS = {filename_zip: "movies.txt.zip", 
