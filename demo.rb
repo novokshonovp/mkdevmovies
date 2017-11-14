@@ -1,28 +1,31 @@
-require_relative 'mkdevmovies'
+require_relative './lib/netflix'
+require_relative './lib/theatre'
 include MkdevMovies
 
-DEFS = {filename_zip: "movies.txt.zip", 
-            filename_txt: "movies.txt"}
+DEFS = { filename_zip: 'movies.txt.zip',
+         filename_txt: 'movies.txt' }.freeze
 
 filename_zip = ARGV[0]
-if ARGV.length<1
-    puts "Too few arguments. Use the default #{DEFS[:filename_zip]}."
-    filename_zip = DEFS[:filename_zip]
+if ARGV.empty?
+  puts "Too few arguments. Use the default #{DEFS[:filename_zip]}."
+  filename_zip = DEFS[:filename_zip]
 end
-if !File.exist?(filename_zip)
-    puts "File #{filename_zip} doesn't exist. Use the default #{DEFS[:filename_zip]}."
-    filename_zip = DEFS[:filename_zip]
+unless File.exist?(filename_zip)
+  puts "File #{filename_zip} doesn't exist. \
+       Use the default #{DEFS[:filename_zip]}."
+  filename_zip = DEFS[:filename_zip]
 end
 
-netflix = Netflix.new(filename_zip,DEFS[:filename_txt])
+netflix = Netflix.new(filename_zip, DEFS[:filename_txt])
 netflix.pay(10)
 
-netflix2 = Netflix.new(filename_zip,DEFS[:filename_txt])
-netflix2.pay(30)
-puts Netflix.cash
-Netflix.take("Bank")
-puts Netflix.cash
+netflix.define_filter(:old_sci_fi) { |movie, year|  movie.r_year < year && movie.genres.include?('Action')  && movie.period == 'ClassicMovie' && !movie.country.include?('UK') }
+netflix.define_filter(:year_between){ |movie, year1, year2|  movie.r_year.between?(year1, year2) }
+netflix.define_filter(:action_by_year){ |movie, year|  movie.genres.include?('Action') && movie.r_year == year } 
+netflix.define_filter(:new_sci_fi) { |movie, year|  movie.r_year > year && movie.genres.include?('Sci-Fi') }
 
-theatre = Theatre.new(filename_zip,DEFS[:filename_txt])
-theatre.buy_ticket("10:05")
-puts theatre.cash
+netflix.define_filter(:newest_sci_fi, from: :new_sci_fi, arg: 2014)
+netflix.define_filter(:terminator, from: :action_by_year, arg: 1984) 
+netflix.show(terminator: true)
+
+          

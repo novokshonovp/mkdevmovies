@@ -1,6 +1,7 @@
-require './movie'
-require './moviecollection'
+require './lib/movie'
+require './lib/moviecollection'
 require './spec/test_movie'
+include MkdevMovies
 
 shared_examples "create by year" do | year, movie_class_name |
   subject { Movie::create(test_movie, nil) }

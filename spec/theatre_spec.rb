@@ -1,7 +1,8 @@
-require './theatre'
+require './lib/theatre'
+include MkdevMovies
 
 shared_examples "deposit to cashbox" do | amount|
-  it { expect{ subject }.to change { theatre.cash.amount }.by(amount) }
+  it { expect { subject }.to change { theatre.cash.amount }.by(amount) }
 end
 
 describe Theatre do  
@@ -20,7 +21,7 @@ describe Theatre do
           it  { expect{subject}.to output("<<Now showing Interstellar 13:30 - 16:19>>\n").to_stdout }
         end
         context "when at night" do
-          before { stub_const("Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
+          before { stub_const("MkdevMovies::Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
           let(:time) { "21:30" } 
           it { expect{subject}.to output("<<Now showing Psycho 21:30 - 23:19>>\n").to_stdout }
         end
@@ -55,7 +56,7 @@ describe Theatre do
       it_behaves_like 'deposit to cashbox', 5
     end
     context "when at night" do
-      before { stub_const("Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
+      before { stub_const("MkdevMovies::Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
       let(:time) { "22:05"}
       it { expect{ subject }.to output("You bought the $10.00 ticket for Psycho.\n").to_stdout }
       it_behaves_like 'deposit to cashbox', 10 

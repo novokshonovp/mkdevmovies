@@ -1,7 +1,7 @@
-require './cashbox'
+require './lib/cashbox'
 require 'money'
 
-
+include MkdevMovies
 describe CashBox do
   let(:dummytheatre) { Class.new { include CashBox} }
   let(:cash_box) { cash_box = dummytheatre.new }

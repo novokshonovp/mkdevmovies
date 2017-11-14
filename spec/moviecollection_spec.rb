@@ -1,6 +1,8 @@
-require './movie'
-require './moviecollection'
+require './lib/movie'
+require './lib/moviecollection'
 require './spec/test_movie'
+include MkdevMovies
+
 describe MovieCollection do
   include_context 'create_test_movie' 
   describe "#all" do
