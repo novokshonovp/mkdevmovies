@@ -18,14 +18,9 @@ end
 
 netflix = Netflix.new(filename_zip, DEFS[:filename_txt])
 netflix.pay(10)
+netflix.define_filter(:years_between){ |movie, year1, year2| movie.r_year.between?(year1, year2) }
+netflix.define_filter(:years_between_83_85, from: :years_between, arg: [1983,1985] )
+netflix.define_filter(:by_year){ |movie, year| movie.r_year==year }
+netflix.define_filter(:by_schwarz){ |movie| movie.actors.grep(/Schwarz/).any? }
+netflix.show( actors: /Schwarz/, years_between_83_85: true ){ |movie| movie.genres.include?('Action') }
 
-netflix.define_filter(:old_sci_fi) { |movie, year|  movie.r_year < year && movie.genres.include?('Action')  && movie.period == 'ClassicMovie' && !movie.country.include?('UK') }
-netflix.define_filter(:year_between){ |movie, year1, year2|  movie.r_year.between?(year1, year2) }
-netflix.define_filter(:action_by_year){ |movie, year|  movie.genres.include?('Action') && movie.r_year == year } 
-netflix.define_filter(:new_sci_fi) { |movie, year|  movie.r_year > year && movie.genres.include?('Sci-Fi') }
-
-netflix.define_filter(:newest_sci_fi, from: :new_sci_fi, arg: 2014)
-netflix.define_filter(:terminator, from: :action_by_year, arg: 1984) 
-netflix.show(terminator: true)
-
-          

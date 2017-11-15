@@ -4,11 +4,11 @@ include MkdevMovies
 
 shared_examples 'show The Terminator' do 
   before do
-    @time_now = Time.now
-    allow(Time).to receive(:now).and_return(@time_now)
+    allow(Time).to receive(:now).and_return(time_now)
   end
   let(:terminator_runtime) { 107 }  
-  it {expect { subject}.to output("<<Now showing The Terminator #{ @time_now.strftime("%H:%M") } - #{ (@time_now + terminator_runtime * 60).strftime("%H:%M") }>>\n").to_stdout }
+  let(:time_now) { Time.now }
+  it {expect { subject}.to output("<<Now showing The Terminator #{ time_now.strftime("%H:%M") } - #{ (time_now + terminator_runtime * 60).strftime("%H:%M") }>>\n").to_stdout }
 end
 
 describe Netflix do  
@@ -45,32 +45,6 @@ describe Netflix do
           let(:filters) { {title: 'The Terminator'} }
           it { expect { subject }.to raise_error "Nothing to show. Change a block's filter options." }
         end
-      end
-      context 'when filter by named filter' do
-        subject { netflix.show( { filter_action => true, filter_year=>true } ) }
-        before do
-          netflix.define_filter(filter_action) { |movie| movie.genres.include?('Action') } 
-          netflix.define_filter(filter_year) { |movie| movie.r_year == 1984 } 
-        end
-        let(:filter_action) { :action }
-        let(:filter_year) { :year }
-        it_behaves_like 'show The Terminator'
-      end
-      context 'when filter by named filters with params' do
-        subject { netflix.show( { filter_name => value } ) }
-        before { netflix.define_filter(:new_sci_fi) { |movie, year| movie.genres.include?('Action') && movie.r_year == year } }        
-        let(:filter_name) { :new_sci_fi }
-        let(:value) { 1984 }
-        it_behaves_like 'show The Terminator'
-      end
-      context 'when filtered by named filter by another filter', :focus => true do
-        subject { netflix.show( {terminator => true } ) }
-        before do
-          netflix.define_filter(:actions_by_year) { |movie, year| movie.genres.include?('Action') && movie.r_year == year } 
-          netflix.define_filter(:actions_1984, from: :actions_by_year, arg: 1984) 
-        end
-        let(:terminator) { :actions_1984 }
-        it_behaves_like 'show The Terminator'       
       end
     end
   end
