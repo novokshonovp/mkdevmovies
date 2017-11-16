@@ -22,5 +22,5 @@ netflix.define_filter(:years_between){ |movie, year1, year2| movie.r_year.betwee
 netflix.define_filter(:years_between_83_85, from: :years_between, arg: [1983,1985] )
 netflix.define_filter(:by_year){ |movie, year| movie.r_year==year }
 netflix.define_filter(:by_schwarz){ |movie| movie.actors.grep(/Schwarz/).any? }
-netflix.show( actors: /Schwarz/, years_between_83_85: true ){ |movie| movie.genres.include?('Action') }
-
+#netflix.show( actors: /Schwarz/, years_between_83_85: true ){ |movie| movie.genres.include?('Action') }
+netflix.show
