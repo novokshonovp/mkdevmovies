@@ -6,9 +6,30 @@ shared_examples "deposit to cashbox" do | amount|
 end
 
 describe Theatre do  
-  let(:theatre) {  Theatre.new("./spec/test_movies.txt.zip","movies.txt") }
-  let(:fake_schedule) { {6..12 => {period: ["AncientMovie"]},12..18 =>  {genres: ["Comedy","Adventure"]}, 18..24 => {genres: ["Horror"]}}
-                                  .transform_values{ |filter| filter.transform_values(&Regexp.method(:union)) }} 
+  let(:theatre) { Theatre.new("./spec/test_movies.txt.zip","movies.txt") do
+                      hall :red, title:'Красный зал', places: 100
+                      hall :blue, title: 'Синий зал', places: 50
+                      hall :green, title: 'Зелёный зал (deluxe)', places: 12   
+                      period '06:00'..'12:00' do
+                        description 'Утренний сеанс'
+                        filters period: 'AncientMovie'
+                        price 3
+                        hall :red, :blue
+                      end
+                     period '12:00'..'18:00' do
+                        description 'Комедии и приключения'
+                        filters genres: ['Comedy', 'Adventure']
+                        price 5
+                        hall :green
+                     end 
+                     period '18:00'..'24:00' do
+                        description 'Ужасы'
+                        filters genres: 'Horror'
+                        price 10
+                        hall :green
+                     end 
+                  end }                   
+
   describe "#show" do
       subject {theatre.show(time)}
       context "when open" do 
@@ -21,7 +42,6 @@ describe Theatre do
           it  { expect{subject}.to output("<<Now showing Interstellar 13:30 - 16:19>>\n").to_stdout }
         end
         context "when at night" do
-          before { stub_const("MkdevMovies::Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
           let(:time) { "21:30" } 
           it { expect{subject}.to output("<<Now showing Psycho 21:30 - 23:19>>\n").to_stdout }
         end
@@ -56,7 +76,6 @@ describe Theatre do
       it_behaves_like 'deposit to cashbox', 5
     end
     context "when at night" do
-      before { stub_const("MkdevMovies::Theatre::SCHEDULE_INTERNAL", fake_schedule ) }
       let(:time) { "22:05"}
       it { expect{ subject }.to output("You bought the $10.00 ticket for Psycho.\n").to_stdout }
       it_behaves_like 'deposit to cashbox', 10 

@@ -27,7 +27,7 @@ describe Netflix do
         it { expect{ subject }.to change(netflix, :user_balance).by(-film_price) }  
       context 'when movie not exist' do
         let(:filters) { { title: 'Non existant movie' } }
-        it { expect { subject }.to raise_error 'Wrong filter options. No movie in the database!' }
+        it { expect { subject }.to raise_error 'Wrong filter options.' }
       end
       context 'with wrong params' do
         let(:filters) { { genre: 'Comedy' } }
