@@ -54,11 +54,16 @@ module MkdevMovies
         is_hall_included = hall.nil? ? true : period.halls.include?(hall)
         period.cover?(time.strftime('%H:%M')) && is_hall_included
       end
+      validate_period!(periods)
+      periods.first
+    end
+    
+    def validate_period!(periods)
+      raise 'Cinema closed!' if periods.empty?
       if periods.count > 1
         halls = periods.map(&:halls).flatten.uniq
         raise "Could not determine a hall. Choose hall (allowed halls: #{halls})"
       end
-      periods.first
     end
   end
 end

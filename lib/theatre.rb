@@ -16,7 +16,6 @@ module MkdevMovies
 
     private def find_movies(time)
       period = period_by_time(time, nil)
-      validate_period!(period)
       filter(period.parse_filter)
     end
 
@@ -37,15 +36,11 @@ module MkdevMovies
     def buy_ticket(time, hall: nil)
       tm = Time.parse(time)
       period = period_by_time(tm, hall)
-      validate_period!(period)
       price = period.params[:price]
       put_cash(price)
       movie = mix(filter(period.parse_filter)).first
       puts "You bought the #{Money.from_amount(price, :USD).format} ticket for #{movie.title}."
     end
 
-    def validate_period!(period)
-      raise 'Cinema closed!' if period.nil?
-    end
   end
 end
