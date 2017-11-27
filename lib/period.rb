@@ -9,7 +9,6 @@ module MkdevMovies
     end
 
     def self.period_defs(*period_specs)
-      @params ||= {}
       period_specs.each do |spec_name|
         define_method(spec_name) do |*args|
           @params[spec_name] = args.size > 1 ? args : args.first
@@ -18,7 +17,7 @@ module MkdevMovies
     end
 
     def halls
-      params[:hall].is_a?(Array) ? params[:hall] : Array(params[:hall])
+      Array(params[:hall])
     end
 
     def overlaps?(new_period)

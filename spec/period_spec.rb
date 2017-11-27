@@ -11,7 +11,7 @@ describe Period do
                    
   describe '#overlaps?' do
     subject { period.overlaps?(new_period) }
-    context 'when overlaps' do
+    context 'when overlaps by halls and time range' do
       let(:new_period) { Period.new('11:00'..'13:00') do
                              description 'Комедии и приключения'
                              filters genres: ['Comedy', 'Adventure']
@@ -20,7 +20,16 @@ describe Period do
                            end  }
       it { is_expected.to be true }
     end
-    context 'when not overlaps' do
+    context 'when same hall and dif time range' do
+      let(:new_period) { Period.new('12:00'..'13:00') do
+                             description 'Комедии и приключения'
+                             filters genres: ['Comedy', 'Adventure']
+                             price 5
+                             hall :green
+                           end  }
+      it { is_expected.to be false }
+    end
+    context 'when dif hall and same time range' do
       let(:new_period) { Period.new('11:00'..'13:00') do
                              description 'Комедии и приключения'
                              filters genres: ['Comedy', 'Adventure']

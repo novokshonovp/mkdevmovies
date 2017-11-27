@@ -81,6 +81,6 @@ describe Schedule do
                           hall :red
                         end
                       end }
-      it { is_expected.to eq( [ { red: ["06:00".."12:00"] } ] ) }
+      it { is_expected.to eq( { red: ["06:00".."12:00"] } ) }
   end
 end

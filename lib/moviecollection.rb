@@ -1,7 +1,7 @@
 require 'zip'
 require 'csv'
-# require 'ostruct'
 require_relative 'movie'
+
 module MkdevMovies
   class MovieCollection
     include Enumerable

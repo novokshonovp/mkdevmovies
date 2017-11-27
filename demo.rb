@@ -40,14 +40,9 @@ theatre =
       hall :green
     end
   end
-  theatrex= Theatre.new('./spec/test_movies.txt.zip', 'movies.txt') do
-                        hall :red, title:'Красный зал', places: 100
-                        period '06:00'..'12:00' do
-                          hall :red
-                        end
-                      end 
+
                       
-puts theatrex.halls_by_periods
-theatre.show('7:30') # how to show in different halls
-puts theatre.when?('The Terminator')
+puts theatre.halls_by_periods.inspect
+theatre.show('7:30')
 theatre.buy_ticket('11:05', hall: :green)
+puts theatre.when?('The Terminator')

@@ -20,54 +20,45 @@ module MkdevMovies
       p = Period.new(time_range, &block)
       @schedule.push(p) if validate(p)
     end
-    
+
     def halls_by_periods
       @halls.map do |hall|
-        time_range = @schedule.map { |period| period.time_range if period.halls.include?(hall.first) }
-                              .compact
-        { hall.first => time_range }
-      end
+        time_range = @schedule.select { |period| period.halls.include?(hall.first) }
+                              .map(&:time_range)
+        [hall.first, time_range]
+      end.to_h
     end
-    
+
     private
 
     def validate(new_period)
-      has_hall?(new_period.halls)
+      validate_hall!(new_period.halls)
       raise 'Time range overlaps!' if period_overlaps?(new_period)
       true
     end
 
-    def has_hall?(halls)
+    def validate_hall!(halls)
       not_found = Array(halls) - Array(@halls.keys)
       raise "Undefined halls: #{not_found}!" unless not_found.empty?
       not_found.empty?
     end
 
     def period_overlaps?(new_period)
-      new_period.halls.any? do |_hall|
-        @schedule.any? do |existing|
-          existing.overlaps?(new_period)
-        end
+      @schedule.any? do |existing|
+        existing.overlaps?(new_period)
       end
     end
 
-    def get_period_by_time(time)
-      periods = get_periods_by_time(time)
+    def period_by_time(time, hall)
+      periods = @schedule.select do |period|
+        is_hall_included = hall.nil? ? true : period.halls.include?(hall)
+        period.cover?(time.strftime('%H:%M')) && is_hall_included
+      end
       if periods.count > 1
         halls = periods.map(&:halls).flatten.uniq
         raise "Could not determine a hall. Choose hall (allowed halls: #{halls})"
       end
       periods.first
     end
-
-    def get_period_by_time_and_hall(time, hall)
-      periods = get_periods_by_time(time).select { |period| period.halls.include?(hall) }
-      periods.first
-    end
-
-    def get_periods_by_time(time)
-      @schedule.select { |period| period.cover?(time.strftime('%H:%M')) }
-    end
-
   end
 end
