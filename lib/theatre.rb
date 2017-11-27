@@ -9,43 +9,43 @@ module MkdevMovies
     include Schedule
 
     def show(time)
-      the_time = Time.parse(time)
-      movies = find_movies(the_time)
-      super(mix(movies).first, the_time)
+      tm = Time.parse(time)
+      movies = find_movies(tm)
+      super(mix(movies).first, tm)
     end
 
     private def find_movies(time)
-      _, schedule = find_schedule(time)
-      get_movies_by_schedule(schedule)
-    end
-
-    private def get_movies_by_schedule(schedule)
-      schedule[:title].nil? ? filter(schedule[:filters]) : filter(title: schedule[:title])
+      period = get_period_by_time(time)
+      validate_period(period)
+      filter(period.parse_filter)
     end
 
     def when?(movie_title)
-      schedule = get_schedule_by_title(movie_title)
-      raise "No schedule for #{movie_title}!" if schedule.empty?
-      "#{movie_title}: " + schedule.keys.join(',')
+      periods = get_periods_by_title(movie_title)
+      raise "No schedule for #{movie_title}!" if periods.empty?
+      "#{movie_title}: #{periods.map(&:time_range).join(',')}"
     end
 
-    def get_schedule_by_title(movie_title)
+    private def get_periods_by_title(movie_title)
       movie = filter(title: movie_title).first
-      schedule_internal.select do |_time, filter|
-        next true unless filter[:title].nil?
-        filter[:filters].all? do |key, value|
-          movie.matches?(key, value)
-        end
+      @schedule.select do |period|
+        filters = period.parse_filter
+        filters.all? { |key, value| movie.matches?(key, value) }
       end
     end
 
-    def buy_ticket(time)
-      the_time = Time.parse(time)
-      _, schedule = find_schedule(the_time)
-      price = schedule[:price]
+    def buy_ticket(time, hall: false)
+      tm = Time.parse(time)
+      period = hall == false ? get_period_by_time(tm) : get_period_by_time_and_hall(tm, hall)
+      validate_period(period)
+      price = period.params[:price]
       put_cash(price)
-      movie = mix(get_movies_by_schedule(schedule)).first
+      movie = mix(filter(period.parse_filter)).first
       puts "You bought the #{Money.from_amount(price, :USD).format} ticket for #{movie.title}."
+    end
+
+    def validate_period(period)
+      raise 'Cinema closed!' if period.nil?
     end
   end
 end

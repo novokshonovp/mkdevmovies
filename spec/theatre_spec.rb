@@ -31,7 +31,7 @@ describe Theatre do
                   end }                   
 
   describe "#show" do
-      subject {theatre.show(time)}
+      subject { theatre.show(time) }
       context "when open" do 
         context "when in the morning" do
           let(:time) { "10:30" } 

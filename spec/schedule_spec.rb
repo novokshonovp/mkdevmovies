@@ -1,6 +1,6 @@
 require './lib/schedule'
 include MkdevMovies
-  
+
 describe Schedule do  
   let(:dummytheatre) { Class.new { include Schedule } }
   
@@ -17,17 +17,11 @@ describe Schedule do
     context 'when right params' do
       let(:title) { 'Красный зал' }
       let(:places) { 100 }
-      let(:red_hall) { { :red=>{:title=>"Красный зал", :places=>100 } } } 
-      it { expect(subject.halls).to  include(red_hall) }
-    end
-    context 'when no title' do
-      let(:title) { nil }
-      let(:places) { 100 }
-      it { expect { subject.halls }.to  raise_error('No title for a hall!') }   
+      it { expect(subject.halls).to  include( { :red=>{:title=>"Красный зал", :places=>100 } } ) }
     end
     context 'when wrong number of places' do
       let(:title) { 'Красный зал' }
-      let(:places) { nil }
+      let(:places) { 0 }
       it { expect { subject.halls }.to  raise_error('Places should be > 0!') }   
     end
   end
@@ -44,8 +38,10 @@ describe Schedule do
                           hall :red, :blue
                         end
                       end }
-      let(:test_period1) { { "06:00".."12:00"=> { :description=>"Утренний сеанс", :filters=>{:period=>"AncientMovie" } , :price=>3, :hall=>[:red, :blue] } } }
-      it { expect(theatre.periods).to include(test_period1) }
+      let(:test_time_range) { "06:00".."12:00" }
+      let(:test_params) { { :description=>"Утренний сеанс", :filters=>{:period=>"AncientMovie" } , :price=>3, :hall=>[:red, :blue] } }
+      it { expect(theatre.schedule.first.time_range).to include(test_time_range) }
+      it { expect(theatre.schedule.first.params).to include(test_params ) }
     end 
     context 'when periods overlaps' do
       subject { dummytheatre.new do
@@ -74,7 +70,17 @@ describe Schedule do
                           hall :green
                         end                        
                       end }  
-        it { expect { subject }.to raise_error 'Not scheduled hall!' }                  
+        it { expect { subject }.to raise_error 'Undefined halls: [:green]!' }                  
     end   
+  end
+  describe '#halls_by_periods' do
+      subject { theatre.halls_by_periods }
+      let(:theatre) { dummytheatre.new do
+                        hall :red, title:'Красный зал', places: 100
+                        period '06:00'..'12:00' do
+                          hall :red
+                        end
+                      end }
+      it { is_expected.to eq( [ { red: ["06:00".."12:00"] } ] ) }
   end
 end

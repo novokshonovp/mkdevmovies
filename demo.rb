@@ -15,48 +15,39 @@ unless File.exist?(filename_zip)
        Use the default #{DEFS[:filename_zip]}."
   filename_zip = DEFS[:filename_zip]
 end
-      
+
 theatre =
-  Theatre.new(filename_zip, DEFS[:filename_txt]) do
-    hall :red, title:'Красный зал', places: 100
+  Theatre.new('./spec/test_movies.txt.zip', 'movies.txt') do
+    hall :red, title: 'Красный зал', places: 100
     hall :blue, title: 'Синий зал', places: 50
-    hall :green, title: 'Зелёный зал (deluxe)', places: 12   
-    hall :vip, title: 'Зелёный зал (deluxe)', places: 12   
-    period '09:00'..'11:00' do
+    hall :green, title: 'Зелёный зал (deluxe)', places: 12
+    period '06:00'..'12:00' do
       description 'Утренний сеанс'
-      filters genres: 'Comedy', r_year: 1900..1980
-      price 10
-      hall :blue
-    end
-   period '11:00'..'16:00' do
-      description 'Спецпоказ'
-      title 'The Terminator'
-      price 50
-      hall :green
-   end
-    period '11:00'..'18:00' do
-      description 'Спецпоказ по 70'
-      title 'The Terminator'
-      price 70
-      hall :vip
-   end
-    period '16:00'..'20:00' do
-      description 'Вечерний сеанс'
-      filters genres: ['Action', 'Drama'], r_year: 2007..Time.now.year
-      price 20
+      filters period: 'AncientMovie'
+      price 3
       hall :red, :blue
     end
-
-    period '19:00'..'22:00' do
-      description 'Вечерний сеанс для киноманов'
-      filters r_year: 1900..1945, exclude_country: 'USA' 
-      price 30
+    period '10:00'..'18:00' do
+      description 'Комедии и приключения'
+      filters genres: %w[Comedy Adventure]
+      price 5
+      hall :green
+    end
+    period '18:00'..'24:00' do
+      description 'Ужасы'
+      filters genres: 'Horror'
+      price 10
       hall :green
     end
   end
-
-theatre.show('22:00')
+  theatrex= Theatre.new('./spec/test_movies.txt.zip', 'movies.txt') do
+                        hall :red, title:'Красный зал', places: 100
+                        period '06:00'..'12:00' do
+                          hall :red
+                        end
+                      end 
+                      
+puts theatrex.halls_by_periods
+theatre.show('7:30') # how to show in different halls
 puts theatre.when?('The Terminator')
-puts theatre.periods
-       
-
+theatre.buy_ticket('11:05', hall: :green)

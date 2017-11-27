@@ -1,97 +1,73 @@
+require_relative 'period'
 
 module MkdevMovies
-
-  class Period
-    attr_reader :schedule
-
-    def initialize(&block)
-      @schedule = {}
-      self.instance_eval(&block)
-    end
-
-    def self.period_defs(*period_specs)
-      @schedule ||= {}
-      period_specs.each do |spec_name|
-        define_method(spec_name) do |*args|
-          @schedule[spec_name] = args.size > 1 ? args : args.first
-        end
-      end
-    end
-    period_defs :description, :filters, :price, :title, :hall
-  end
-
   module Schedule
-    attr_accessor :halls, :periods
+    attr_accessor :halls, :schedule
     def initialize(*args, &block)
       raise 'Need a block to create Theatre!' unless block_given?
       super(*args)
       instance_eval(&block)
     end
 
-    def hall(*args)
-      raise 'Hall should have title and places' if args.size < 2
-      raise 'No title for a hall!' if args.last[:title].to_s.empty?
-      raise 'Places should be > 0!' if args.last[:places].nil? || args.last[:places] <= 0
+    def hall(id, title:, places:)
+      raise 'Places should be > 0!' if places <= 0
       @halls ||= {}
-      @halls[args.first] = { title: args.last[:title], places: args.last[:places] }
+      @halls[id] = { title: title, places: places }
     end
 
-    def period(args, &block)
-      @periods ||= {}
-      p = Period.new(&block)
-      @periods[args] = p.schedule if validate(p.schedule, args)
+    def period(time_range, &block)
+      @schedule ||= []
+      p = Period.new(time_range, &block)
+      @schedule.push(p) if validate(p)
     end
-
+    
+    def halls_by_periods
+      @halls.map do |hall|
+        time_range = @schedule.map { |period| period.time_range if period.halls.include?(hall.first) }
+                              .compact
+        { hall.first => time_range }
+      end
+    end
+    
     private
 
-    def validate(new_period, time_range)
-      raise 'Not scheduled hall!' unless hall?(new_period[:hall])
-      raise 'Time range overlaps!' if time_range_overlaps?(new_period, time_range)
+    def validate(new_period)
+      has_hall?(new_period.halls)
+      raise 'Time range overlaps!' if period_overlaps?(new_period)
       true
     end
 
-    def hall?(halls)
-      Array(halls).all? { |hall| @halls.include?(hall) }
+    def has_hall?(halls)
+      not_found = Array(halls) - Array(@halls.keys)
+      raise "Undefined halls: #{not_found}!" unless not_found.empty?
+      not_found.empty?
     end
 
-    def time_range_overlaps?(period, time_range)
-      Array(period[:hall]).any? do |hall|
-        @periods.any? do |value|
-          time_range_overlapsed = (value.first.to_a & time_range.to_a).size > 1
-          halls_overlapsed = !(Array(value.last[:hall]) & Array(hall)).empty?
-          true if time_range_overlapsed && halls_overlapsed
+    def period_overlaps?(new_period)
+      new_period.halls.any? do |_hall|
+        @schedule.any? do |existing|
+          existing.overlaps?(new_period)
         end
       end
     end
 
-    def find_schedule(time)
-      schedules = get_schedules_by_time(time)
-      raise 'Cinema closed!' if schedules.empty?
-      choose_hall(schedules).first
-    end
-
-    def get_schedules_by_time(time)
-      schedule_internal.select { |schedule_time, _| schedule_time.cover?(time.strftime('%H:%M')) }
-    end
-
-    def schedule_internal
-      @periods.transform_values do |filter|
-        unless filter[:filters].nil?
-          filter[:filters].transform_values! do |value|
-            value.is_a?(Array) ? Regexp.union(value) : value
-          end
-        end
-        filter
+    def get_period_by_time(time)
+      periods = get_periods_by_time(time)
+      if periods.count > 1
+        halls = periods.map(&:halls).flatten.uniq
+        raise "Could not determine a hall. Choose hall (allowed halls: #{halls})"
       end
+      periods.first
     end
 
-    def choose_hall(filters)
-      return filters if filters.count == 1
-      halls_to_ask = filters.map { |_, value| value[:hall] }.flatten.uniq
-      print("Choose hall [#{halls_to_ask.join(' | ')}]: ")
-      x = gets.strip.to_sym
-      raise 'Wrong hall!' unless halls_to_ask.include?(x)
-      filters.select { |_, value| Array(value[:hall]).include?(x) }
+    def get_period_by_time_and_hall(time, hall)
+      periods = get_periods_by_time(time).select { |period| period.halls.include?(hall) }
+      periods.first
     end
+
+    def get_periods_by_time(time)
+      @schedule.select { |period| period.cover?(time.strftime('%H:%M')) }
+    end
+
   end
 end
