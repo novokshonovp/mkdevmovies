@@ -3,12 +3,7 @@ require 'virtus'
 require_relative 'moviecollection'
 
 module MkdevMovies
-  class Genre < Virtus::Attribute
-    def coerce(value)
-      value.split(',')
-    end
-  end
-  class Actors < Virtus::Attribute
+  class StrArray < Virtus::Attribute
     def coerce(value)
       value.split(',')
     end
@@ -29,11 +24,11 @@ module MkdevMovies
     attribute :r_year, Integer
     attribute :country, String
     attribute :r_date, DateTime
-    attribute :genres, Genre
+    attribute :genres, StrArray
     attribute :runtime, RunTime
     attribute :rating, Float
     attribute :director, String
-    attribute :actors, Actors
+    attribute :actors, StrArray
     attribute :period, String
     def self.attributes
       attribute_set.each.map(&:name)
