@@ -3,9 +3,9 @@ require './lib/moviecollection'
 require './spec/test_movie'
 include MkdevMovies
 
-shared_examples "create by year" do | year, movie_class_name |
+shared_examples 'create by year' do | year, movie_class_name |
   subject { Movie::create(test_movie, nil) }
-  let(:test_movie){ wrong_movie.r_year = year 
+  let(:test_movie){ wrong_movie[:r_year] = year 
                     wrong_movie }
   it { is_expected.to be_instance_of(movie_class_name) }
 end
@@ -14,11 +14,11 @@ end
 describe Movie do
   include_context 'create_test_movie' 
   
-  describe "#matches?" do
+  describe '#matches?' do
     subject {movie.matches?(field,filter)}
     context "when matches by string" do
       let(:field){ :genres }
-      let(:filter) { "Crime" }
+      let(:filter) { 'Crime' }
       it {is_expected.to be true }
     end
     context "when matches by Regexp" do
@@ -34,12 +34,12 @@ describe Movie do
     context "when doesn't have field" do
       let(:field){ :genre }
       let(:filter) { "Drama" }  
-      it { expect{ subject }.to raise_error "Doesn't have field \"#{field}\"!"} 
+      it { expect { subject }.to raise_error "Doesn't have field \"#{field}\"!" } 
     end
   end
 
-  describe "#month" do
-    it {expect(movie.month).to eq("October")}   
+  describe "#r_date" do
+    it { expect(movie.r_date).to be_instance_of(DateTime) }   
   end
   
   describe "#has_genre?" do

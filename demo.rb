@@ -16,12 +16,33 @@ unless File.exist?(filename_zip)
   filename_zip = DEFS[:filename_zip]
 end
 
-netflix = Netflix.new(filename_zip, DEFS[:filename_txt])
-netflix.pay(10)
-netflix.define_filter(:years_between){ |movie, year1, year2| movie.r_year.between?(year1, year2) }
-netflix.define_filter(:years_between_83_85, from: :years_between, arg: [1983,1985] )
-netflix.define_filter(:by_year){ |movie, year| movie.r_year==year }
-netflix.define_filter(:by_schwarz){ |movie| movie.actors.grep(/Schwarz/).any? }
-#netflix.show( actors: /Schwarz/, years_between_83_85: true ){ |movie| movie.genres.include?('Action') }
-netflix.show
+theatre =
+  Theatre.new('./spec/test_movies.txt.zip', 'movies.txt') do
+    hall :red, title: 'Красный зал', places: 100
+    hall :blue, title: 'Синий зал', places: 50
+    hall :green, title: 'Зелёный зал (deluxe)', places: 12
+    period '06:00'..'12:00' do
+      description 'Утренний сеанс'
+      filters period: 'AncientMovie'
+      price 3
+      hall :red, :blue
+    end
+    period '10:00'..'18:00' do
+      description 'Комедии и приключения'
+      filters genres: %w[Comedy Adventure]
+      price 5
+      hall :green
+    end
+    period '18:00'..'24:00' do
+      description 'Ужасы'
+      filters genres: 'Horror'
+      price 10
+      hall :green
+    end
+  end
 
+                      
+puts theatre.halls_by_periods.inspect
+theatre.show('7:30')
+theatre.buy_ticket('11:05', hall: :green)
+puts theatre.when?('The Terminator')

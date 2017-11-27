@@ -1,43 +1,46 @@
 require 'time'
 require_relative 'cinema'
 require_relative 'cashbox'
+require_relative 'schedule'
+
 module MkdevMovies
   class Theatre < Cinema
     include CashBox
-    SCHEDULE = { 6..12 => { period: ['AncientMovie'] }, 12..18 => { genres: %w[Comedy Adventure] },
-                 18..24 => { genres: %w[Drama Horror] } }.freeze
-    SCHEDULE_INTERNAL = SCHEDULE.transform_values do |filter|
-      filter.transform_values(&Regexp.method(:union))
-    end
-    PRICE = { 6..12 => 3, 12..18 => 5, 18..24 => 10 }.freeze
+    include Schedule
+
     def show(time)
-      the_time = Time.parse(time)
-      movies = find_movies(the_time)
-      super(mix(movies).first, the_time)
+      tm = Time.parse(time)
+      movies = find_movies(tm)
+      super(mix(movies).first, tm)
     end
 
     private def find_movies(time)
-      _, filters = SCHEDULE_INTERNAL.detect { |schedule_time, _| schedule_time.cover?(time.hour) }
-      raise 'Cinema closed!' if filters.nil?
-      filter(filters)
+      period = period_by_time(time, nil)
+      filter(period.parse_filter)
     end
 
-    def when?(title)
-      movie = filter(title: title).first
-      schedule = SCHEDULE_INTERNAL.select do |_time, filter|
-        filter.all? do |key, value|
-          movie.matches?(key, value)
-        end
+    def when?(movie_title)
+      periods = periods_by_title(movie_title)
+      raise "No schedule for #{movie_title}!" if periods.empty?
+      "#{movie_title}: #{periods.map(&:time_range).join(',')}"
+    end
+
+    private def periods_by_title(movie_title)
+      movie = filter(title: movie_title).first
+      @schedule.select do |period|
+        filters = period.parse_filter
+        filters.all? { |key, value| movie.matches?(key, value) }
       end
-      schedule.empty? ? (raise "No schedule for #{title}!") : "#{title}: " + schedule.keys.join(',')
     end
 
-    def buy_ticket(time)
-      the_time = Time.parse(time)
-      movie = mix(find_movies(the_time)).first
-      _, price = PRICE.detect { |price_time, _| price_time.cover?(the_time.hour) }
+    def buy_ticket(time, hall: nil)
+      tm = Time.parse(time)
+      period = period_by_time(tm, hall)
+      price = period.params[:price]
       put_cash(price)
+      movie = mix(filter(period.parse_filter)).first
       puts "You bought the #{Money.from_amount(price, :USD).format} ticket for #{movie.title}."
     end
+
   end
 end
