@@ -1,9 +1,16 @@
+require 'haml'
+
 require_relative './lib/netflix'
 require_relative './lib/theatre'
+require_relative './lib/cinemaconverter'
+
 include MkdevMovies
 
 DEFS = { filename_zip: 'movies.txt.zip',
          filename_txt: 'movies.txt' }.freeze
+KEY_CODE = 'dad2ab070e32d9245be1effef55b641f'.freeze
+FILENAME_YAML = 'tmdb_data.yaml'.freeze
+POSTER_PATH = './images'.freeze
 
 filename_zip = ARGV[0]
 if ARGV.empty?
@@ -16,33 +23,16 @@ unless File.exist?(filename_zip)
   filename_zip = DEFS[:filename_zip]
 end
 
-theatre =
-  Theatre.new('./spec/test_movies.txt.zip', 'movies.txt') do
-    hall :red, title: 'Красный зал', places: 100
-    hall :blue, title: 'Синий зал', places: 50
-    hall :green, title: 'Зелёный зал (deluxe)', places: 12
-    period '06:00'..'12:00' do
-      description 'Утренний сеанс'
-      filters period: 'AncientMovie'
-      price 3
-      hall :red, :blue
-    end
-    period '10:00'..'18:00' do
-      description 'Комедии и приключения'
-      filters genres: %w[Comedy Adventure]
-      price 5
-      hall :green
-    end
-    period '18:00'..'24:00' do
-      description 'Ужасы'
-      filters genres: 'Horror'
-      price 10
-      hall :green
-    end
-  end
+netflix = Netflix.new('./spec/test_one_movie.txt.zip', 'movies.txt')
 
-                      
-puts theatre.halls_by_periods.inspect
-theatre.show('7:30')
-theatre.buy_ticket('11:05', hall: :green)
-puts theatre.when?('The Terminator')
+puts 'Downloading budget data from imdb.com ...'
+converter = CinemaConverter.new(netflix, FILENAME_YAML)
+converter.load_tmdb_data_to_file(KEY_CODE, FILENAME_YAML)
+converter.add_tmpdb_data_to_collection(FILENAME_YAML)
+converter.download_posters(POSTER_PATH)
+
+template = File.read('./show_collection.haml')
+puts 'Render html ...'
+output = Haml::Engine.new(template).render(converter)
+File.open('./show_collection.html', 'w') { |file| file.write(output) }
+puts 'Finished'

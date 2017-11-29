@@ -57,7 +57,7 @@ module MkdevMovies
       validate_period!(periods)
       periods.first
     end
-    
+
     def validate_period!(periods)
       raise 'Cinema closed!' if periods.empty?
       if periods.count > 1

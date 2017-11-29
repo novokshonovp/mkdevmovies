@@ -41,6 +41,5 @@ module MkdevMovies
       movie = mix(filter(period.parse_filter)).first
       puts "You bought the #{Money.from_amount(price, :USD).format} ticket for #{movie.title}."
     end
-
   end
 end
