@@ -13,11 +13,6 @@ end
 
 describe Movie do
   include_context 'create_test_movie' 
-  describe '#add_attribute' do
-    before { movie.add_attribute(:budget, String, "$100 000") }
-    subject { movie.budget }
-    it { is_expected.to eq("$100 000") }
-  end
   describe '#matches?' do
     subject {movie.matches?(field,filter)}
     context "when matches by string" do

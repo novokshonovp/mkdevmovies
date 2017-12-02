@@ -30,27 +30,19 @@ module MkdevMovies
     attribute :director, String
     attribute :actors, StrArray
     attribute :period, String
-    attribute :imdb_id, String
-
-    def add_attribute(name, type, default = nil)
-      return if instance_variables.include?("@#{name}".to_sym)
-      extend(Virtus.model)
-      attribute(name, type)
-      send("#{name}=", default)
-    end
-
-    def attributes
-      attribute_set.each.map(&:name)
+    
+    def imdb_id
+      URI.parse(link).path.split('/').last
     end
 
     def self.attributes
-      attribute_set.each.map(&:name)
+     attribute_set.each.map(&:name).push(@dynamic_attributes)
     end
 
     def initialize(movie, movie_collection)
       @movies_collection = movie_collection
+      @dynamic_attributes = [:imdb_id]
       super(movie)
-      @imdb_id = URI.parse(@link).path.split('/').last
     end
 
     def self.create(movie, movie_collection)
