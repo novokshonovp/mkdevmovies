@@ -1,35 +1,30 @@
-require_relative 'record'
 require_relative 'tmdbfetcher'
 
 module MkdevMovies
-  module TMDBRecord
-    include Record
+  class  TMDBRecord 
 
-    CONFIG_NAMES = { title: :title_ru, poster_path: :poster_id }.freeze
-    Record.add_attributes(CONFIG_NAMES.values)
-
-    def self.def_fields(field_names)
-      field_names.each do |field_name|
-        define_method(field_name) do
-          cached?(imdb_id, field_name) ? get(imdb_id, field_name) : fetch(imdb_id, field_name)
-        end
-      end
+    def initialize(cache, fields) 
+      @config_names = fields
+      @cache = cache
     end
 
+    def data(imdb_id, field_name)
+      @cache.fetch(imdb_id, field_name) { get_remote(imdb_id) }
+    end
+    
     private
 
     def get_remote(imdb_id)
       data = TMDBFetcher.new.data(imdb_id)
       data = JSON(data)['movie_results'].first.select do |field_name, _value|
-        CONFIG_NAMES.keys.include?(field_name.to_sym)
+        @config_names.keys.include?(field_name.to_sym)
       end
       translate_names(data)
     end
 
     def translate_names(data)
-      data.map { |field_name, value| [CONFIG_NAMES[field_name.to_sym], value] }.to_h
+      data.map { |field_name, value| [@config_names[field_name.to_sym], value] }.to_h
     end
 
-    def_fields CONFIG_NAMES.values
   end
 end
