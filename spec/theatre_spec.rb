@@ -1,4 +1,9 @@
+require 'simplecov'
+SimpleCov.start
+
+require 'dotenv/load'
 require './lib/theatre'
+
 include MkdevMovies
 
 shared_examples "deposit to cashbox" do | amount|
@@ -6,7 +11,8 @@ shared_examples "deposit to cashbox" do | amount|
 end
 
 describe Theatre do  
-  let(:theatre) { Theatre.new("./spec/test_movies.txt.zip","movies.txt") do
+  before { Dotenv.overload('./spec/movies.env') }
+  let(:theatre) { Theatre.new do
                       hall :red, title:'Красный зал', places: 100
                       hall :blue, title: 'Синий зал', places: 50
                       hall :green, title: 'Зелёный зал (deluxe)', places: 12   

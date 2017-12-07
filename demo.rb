@@ -1,32 +1,47 @@
-require_relative './lib/netflix'
+# require_relative './lib/netflix'
+
+# require_relative './lib/movierenderer'
+require 'dotenv'
+Dotenv.load('./spec/movies.env')
 require_relative './lib/theatre'
-require_relative './lib/movierenderer'
+
 include MkdevMovies
 
-DEFS = { filename_zip: 'movies.txt.zip',
-         filename_txt: 'movies.txt' }.freeze
+# netflix = Netflix.new('./spec/test_movies.txt.zip', 'movies.txt')
 
-FILENAME_YAML = 'tmdb_data.yaml'.freeze
-POSTER_PATH = './images'.freeze
-
-filename_zip = ARGV[0]
-if ARGV.empty?
-  puts "Too few arguments. Use the default #{DEFS[:filename_zip]}."
-  filename_zip = DEFS[:filename_zip]
-end
-unless File.exist?(filename_zip)
-  puts "File #{filename_zip} doesn't exist. \
-       Use the default #{DEFS[:filename_zip]}."
-  filename_zip = DEFS[:filename_zip]
+module A
+  def self.add_method(method_name, _context)
+    # context.instance_eval
+    define_method(method_name) do
+      response
+    end
+  end
 end
 
-netflix = Netflix.new('./spec/test_one_movie.txt.zip', 'movies.txt')
+module B
+  extend A
+  add_method('title_ru', self)
+  def response
+    puts 'module B response'
+  end
+end
+module C
+  extend A
+  add_method('budget', self)
+  def response
+    puts 'module C response'
+  end
+end
 
-require_relative './lib/fetchercache'
-
-Movie.include(FetcherCache::MovieExtender)
-
-puts netflix.all.first.title_ru
-
-mr = MovieRenderer.new(netflix).download_tmdb_posters
-mr.render('./show_collection.haml', './show_collection.html')
+class Mov
+  include B
+  include C
+end
+x = Mov.new
+x.title_ru
+# puts x.methods
+# collection = MovieCollection.new
+# puts collection.all.first.title_ru
+# puts m.has_genre?('Action')
+# puts Record.attributes.inspect
+# c.cache.data.each { |id, values|  puts "#{id},#{values[:title]}, #{values[:r_year]}" }

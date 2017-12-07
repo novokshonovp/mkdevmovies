@@ -1,5 +1,10 @@
+require 'simplecov'
+SimpleCov.start
+
+require 'dotenv/load'
 require './lib/netflix'
 require 'money'
+
 include MkdevMovies
 
 shared_examples 'show The Terminator' do 
@@ -11,8 +16,9 @@ shared_examples 'show The Terminator' do
   it {expect { subject}.to output("<<Now showing The Terminator #{ time_now.strftime("%H:%M") } - #{ (time_now + terminator_runtime * 60).strftime("%H:%M") }>>\n").to_stdout }
 end
 
-describe Netflix do  
-  let(:netflix) {  Netflix.new('movies.txt.zip', 'movies.txt') }
+describe Netflix do
+  before {    Dotenv.overload('./spec/movies.env') }  
+  let(:netflix) {  Netflix.new }
 
   describe '#show' do
     let(:filters) { {title: 'The Terminator'} }

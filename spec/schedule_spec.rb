@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 require './lib/schedule'
 include MkdevMovies
 
@@ -73,6 +76,7 @@ describe Schedule do
         it { expect { subject }.to raise_error 'Undefined halls: [:green]!' }                  
     end   
   end
+  
   describe '#halls_by_periods' do
       subject { theatre.halls_by_periods }
       let(:theatre) { dummytheatre.new do

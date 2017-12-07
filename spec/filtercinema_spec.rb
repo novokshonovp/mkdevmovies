@@ -1,16 +1,21 @@
-require './lib/filtercinema'
+require 'simplecov'
+SimpleCov.start
+require 'dotenv'
+Dotenv.load('./spec/movies.env')
+
 require './lib/netflix'
+
 include MkdevMovies
 
-describe FilterCinema do
   shared_examples 'return The Terminator' do 
     it { expect(subject.first.title).to eq('The Terminator') }
   end
   shared_examples 'return all movies' do
-    it { expect(subject.count).to eq(250) }
+    it { expect(subject.count).to eq(4) }
   end
-
-  let(:netflix) { Netflix.new('movies.txt.zip', 'movies.txt') }
+  
+describe FilterCinema do
+  let(:netflix) { Netflix.new }
   let(:filtercinema) { FilterCinema.new(netflix) }
   
   describe '#add_user_filter' do

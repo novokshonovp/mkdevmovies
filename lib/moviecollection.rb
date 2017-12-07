@@ -1,17 +1,25 @@
-require 'zip'
+require 'open-uri'
 require 'csv'
+require 'dotenv'
 require_relative 'movie'
+require_relative 'cache'
 
 module MkdevMovies
   class MovieCollection
     include Enumerable
+    FILE_CACHE_YAML = ENV['FILE_CACHE_YAML']
+    attr_reader :movies, :cache
     DATA_STRUCTURE = %i[link title r_year country r_date genres runtime rating director actors].freeze
-    attr_reader :movies
 
-    def initialize(filename_zip, filename_txt)
-      zip_file = Zip::File.new(filename_zip).read(filename_txt)
-      @movies = CSV.parse(zip_file, col_sep: '|', headers: DATA_STRUCTURE)
-                   .map { |movie_fixture| Movie.create(movie_fixture.to_hash, self) }
+    def initialize
+      @cache = Cache.new(FILE_CACHE_YAML)
+
+      file = File.open(ENV['FILE_RECORD_TXT']).read
+      @movies = CSV.parse(file, col_sep: '|', headers: DATA_STRUCTURE)
+                   .map do |movie_fixture|
+                     imdb_id = URI.parse(movie_fixture.to_hash[:link]).path.split('/').last.to_sym
+                     Movie.create(imdb_id, self)
+                   end
     end
 
     def all

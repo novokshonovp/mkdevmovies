@@ -6,10 +6,10 @@ module MkdevMovies
     extend CashBox
     PRICES = { AncientMovie: 1, ClassicMovie: 1.5, ModernMovie: 3, NewMovie: 5 }.freeze
     attr_reader :user_balance, :key_filter
-    def initialize(filename_zip, filename_txt)
+    def initialize
       @user_balance = Money.new(0, :USD)
       @key_filter = FilterCinema.new(self)
-      super(filename_zip, filename_txt)
+      super
     end
 
     def pay(amount)
