@@ -1,4 +1,4 @@
-require 'date'
+
 require_relative 'filerecord'
 require_relative 'tmdbrecord'
 require_relative 'imdbrecord'
@@ -10,71 +10,25 @@ module MkdevMovies
     require_relative 'movie_children'
     PERIODS = { 1900..1945 => AncientMovie, 1946..1968 => ClassicMovie, 1969..2000 => ModernMovie,
                 2001..Date.today.year => NewMovie }.freeze
-    ATTRS = %i[link title r_year country r_date genres runtime rating director actors period title_ru poster_id budget].freeze
+    attr_reader :attributes
+
     def initialize(imdb_id, collection)
       @collection = collection
-      @imdb_id = imdb_id
-      @fmdb = FileRecord.new(collection.cache)
-      @tmdb = TMDBRecord.new(collection.cache,  { title: :title_ru, poster_path: :poster_id } )
-      @imdb = IMDBRecord.new(collection.cache)
-    end
- 
-    def link
-      @fmdb.data(@imdb_id, :link)
+      @attributes = [:period]
+      @records = [FileRecord, TMDBRecord, IMDBRecord].each do |klass|
+        new_record = klass.new(imdb_id, collection.cache)
+        klass.import_attributes(self, new_record)
+        new_record
+      end
     end
 
-    def title
-      @fmdb.data(@imdb_id, :title)
-    end
-
-    def r_year
-      @fmdb.data(@imdb_id, :r_year).to_i
-    end
-
-    def country
-      @fmdb.data(@imdb_id, :country)
-    end
-
-    def r_date
-      Date.parse(@fmdb.data(@imdb_id, :r_date))
-    end
-
-    def genres
-      @fmdb.data(@imdb_id, :genres).split(',')
-    end
-
-    def runtime
-      @fmdb.data(@imdb_id, :runtime).to_i
-    end
-
-    def rating
-      @fmdb.data(@imdb_id, :rating).to_f
-    end
-
-    def director
-      @fmdb.data(@imdb_id, :director)
-    end
-
-    def actors
-      @fmdb.data(@imdb_id, :actors).split(',')
-    end
-       
-    def title_ru
-      @tmdb.data(@imdb_id, :title_ru)
-    end
-    def poster_id
-      @tmdb.data(@imdb_id, :poster_id)
-    end
-    def budget
-      @imdb.data(@imdb_id, :budget)
-    end
-    
     def period
       self.class.name.split('::').last
-    end    
-    
+    end
+
     def self.create(imdb_id, collection)
-      r_year = FileRecord.data(imdb_id, :r_year, collection.cache).to_i
+      raise "No data for imdb_id: #{imdb_id}" unless collection.cache.cached?(imdb_id, :r_year)
+      r_year = collection.cache.get(imdb_id, :r_year).to_i
       _, period =  PERIODS.detect { |key, _class| key.cover?(r_year) }
       raise 'Wrong period to create movie!' if period.nil?
       period.new(imdb_id, collection)
@@ -93,10 +47,7 @@ module MkdevMovies
         filter === movie_field
       end
     end
-    
-    def attributes
-      ATTRS
-    end
+
     private
 
     attr_reader :collection

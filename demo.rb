@@ -10,11 +10,15 @@ include MkdevMovies
 # netflix = Netflix.new('./spec/test_movies.txt.zip', 'movies.txt')
 
 # puts x.methods
- collection = MovieCollection.new
- puts collection.all.first.title
- puts collection.all.first.title_ru
-  puts collection.all.first.poster_id
-   puts collection.all.first.budget
+collection = MovieCollection.new
+puts collection.all.first.title.inspect
+puts collection.all.first.attributes.inspect
+puts collection.all.first.r_year.inspect
+puts collection.all.first.genres.inspect
+puts collection.all.first.r_date.inspect
+puts collection.all.first.title_ru
+puts collection.all.first.poster_id
+puts collection.all.first.budget
 # puts m.has_genre?('Action')
 # puts Record.attributes.inspect
 # c.cache.data.each { |id, values|  puts "#{id},#{values[:title]}, #{values[:r_year]}" }

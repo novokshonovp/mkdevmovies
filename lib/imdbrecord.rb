@@ -1,15 +1,12 @@
+require_relative 'record'
 require_relative 'imdbfetcher'
 
 module MkdevMovies
-  class IMDBRecord 
-    
-    def initialize(cache) 
-      @cache = cache
-    end
-        
-    def data(imdb_id, field_name)
-      @cache.fetch(imdb_id, field_name) { IMDBFetcher.new.data(imdb_id) }
-    end
+  class IMDBRecord < Record
+    FIELDS = { budget: %i[budget to_s] }.freeze
 
+    def data(field_name)
+      fetch(field_name) { IMDBFetcher.new.data(@imdb_id) }
+    end
   end
 end

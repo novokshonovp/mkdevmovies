@@ -23,11 +23,6 @@ module MkdevMovies
       @data[imdb_id] = @data[imdb_id].nil? ? data : @data[imdb_id].merge(data)
       self
     end
-    def fetch(imdb_id, field)
-      return get(imdb_id, field) if cached?(imdb_id, field)
-      put(imdb_id, yield).save
-      get(imdb_id, field)
-    end
 
     def save
       File.open(@filename_yaml.to_s, 'w') do |file|
@@ -39,12 +34,9 @@ module MkdevMovies
     private
 
     def load
-      @data = YAML.load_stream(File.open(@filename_yaml)).first if File.exist?(@filename_yaml)
+      @data = YAML.load_stream(File.open(@filename_yaml, 'r')).first if File.exist?(@filename_yaml)
       @data ||= {}
       self
-    end
-    module Interface
-      
     end
   end
 end
