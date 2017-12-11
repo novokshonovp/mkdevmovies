@@ -23,12 +23,11 @@ describe Cache do
   
   describe '#save' do
     before do 
-      allow(File).to receive(:open).with(cache_file,'r').and_call_original 
-      allow(File).to receive(:open).with(cache_file,'w').and_yield(buffer) 
-      cache.save
+      allow(File).to receive(:open).with(cache_file,'r:bom|utf-8').and_call_original 
+      expect(File).to receive(:write).with(cache_file, cache.data.to_yaml) 
     end
-    let(:buffer) { StringIO.new() }
-    it { expect(buffer.string).to eq(YAML.dump(cache.data)) }
+    subject { cache.save }
+    it { is_expected.to eq(cache) }
   end
   
 end

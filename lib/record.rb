@@ -1,14 +1,10 @@
 
 module MkdevMovies
   class Record
-    def self.import_attributes(object, mdb)
-      mdb.class::FIELDS.each do |name, conv|
-        object.instance_eval do
-          define_singleton_method(name) do
-            conv.last.respond_to?(:call) ? conv.last.call(mdb.data(name)) : mdb.data(name).send(conv.last)
-          end
-          object.attributes.push(name)
-        end
+     
+    def self.import_attributes(object, mdb_class)
+      mdb_class.attributes.each do |attr|
+        object.instance_eval { define_method(attr) { @records[mdb_class].get(attr) } }
       end
     end
 
@@ -17,9 +13,8 @@ module MkdevMovies
       @cache = cache
     end
 
-    def fetch(field)
-      return @cache.get(@imdb_id, field) if @cache.cached?(@imdb_id, field)
-      @cache.put(@imdb_id, yield).save
+    def get(field)
+      @cache.put(@imdb_id, fetch).save unless @cache.cached?(@imdb_id, field)
       @cache.get(@imdb_id, field)
     end
   end

@@ -1,7 +1,8 @@
 require 'simplecov'
 SimpleCov.start
 
-require 'dotenv/load'
+require 'dotenv'
+Dotenv.load('./spec/movies.env') 
 require './lib/movie'
 require './lib/cache'
 require './lib/moviecollection'

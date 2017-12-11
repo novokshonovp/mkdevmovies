@@ -4,37 +4,35 @@ require 'yaml'
 module MkdevMovies
   class Cache
     attr_reader :data
-    def initialize(path_cache_file)
+    def initialize(path)
       @data = {}
-      @filename_yaml = path_cache_file
+      @path = path
       load
     end
 
-    def cached?(imdb_id, field)
-      return false if @data[imdb_id].nil?
-      !@data[imdb_id][field].nil?
+    def cached?(id, field)
+      @data[id]&.key?(field)
     end
 
-    def get(imdb_id, field)
-      @data[imdb_id][field]
+    def get(id, field)
+      @data[id][field]
     end
 
-    def put(imdb_id, data)
-      @data[imdb_id] = @data[imdb_id].nil? ? data : @data[imdb_id].merge(data)
+    def put(id, data)
+      @data[id] ||= {}
+      @data[id] = @data[id].merge(data)
       self
     end
 
     def save
-      File.open(@filename_yaml.to_s, 'w') do |file|
-        file.write YAML.dump(@data)
-      end
+      File.write(@path, @data.to_yaml)
       self
     end
 
     private
 
     def load
-      @data = YAML.load_stream(File.open(@filename_yaml, 'r')).first if File.exist?(@filename_yaml)
+      @data = YAML.load_file(@path) if File.exist?(@path)
       @data ||= {}
       self
     end

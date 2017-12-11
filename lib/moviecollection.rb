@@ -17,10 +17,8 @@ module MkdevMovies
       @movies = CSV.parse(file, col_sep: '|', headers: DATA_STRUCTURE)
                    .map do |movie_fixture|
                      imdb_id = URI.parse(movie_fixture.to_hash[:link]).path.split('/').last.to_sym
-                     @cache.put(imdb_id, movie_fixture.to_hash)
                      Movie.create(imdb_id, self)
                    end
-      @cache.save
     end
 
     def all
