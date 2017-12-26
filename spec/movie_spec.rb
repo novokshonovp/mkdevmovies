@@ -20,9 +20,11 @@ describe Movie do
   end
   after { FileUtils.rm_r(Dir['./spec/tmp/*']) }
   let(:dummycollection) { MovieCollection.new }   
-  let(:movie) { Movie::create(imdb_id, dummycollection) }
+  let(:movie) { dummycollection.first }
   let(:imdb_id) { :tt0034583 }    
-
+  describe 'Movie.attributes' do
+    it { expect(Movie.attributes).to eq( %i[period link title r_year country r_date genres runtime rating director actors title_ru poster_id budget]) }
+  end
   describe '#link' do
     subject { movie.link }
     it { is_expected.to eq('http://imdb.com/title/tt0034583/?ref_=chttp_tt_32') }
@@ -129,36 +131,31 @@ describe Movie do
   end 
     
   describe '#create' do
-    subject { Movie::create(imdb_id, dummycollection) }
     context 'when Casablanca' do
-      let(:imdb_id) { :tt0034583 }
+      subject { dummycollection.all.first }
       it { is_expected.to be_instance_of(AncientMovie) }
       it { expect(subject.to_s).to eq('<<Casablanca - Ancient movie (1942).>>') }
     end 
     context 'when The Terminator' do
-      let(:imdb_id) { :tt0088247 }
+       subject { dummycollection.all[2] }
       it { is_expected.to be_instance_of(ModernMovie) }
       it { expect(subject.to_s).to eq('<<The Terminator - Modern movie, stars: Arnold Schwarzenegger, Linda Hamilton, Michael Biehn.>>') }
     end     
     context 'when Psycho' do
-      let(:imdb_id) { :tt0054215 }
+      subject { dummycollection.all.last }
       it { is_expected.to be_instance_of(ClassicMovie) }
       it { expect(subject.to_s).to eq('<<Psycho - Classic movie, director: Alfred Hitchcock.>>') }
     end      
     context 'when InterStellar' do
-      let(:imdb_id) { :tt0816692 }
+      subject { dummycollection.all[1] }
       it { is_expected.to be_instance_of(NewMovie) }
       it { expect(subject.to_s).to eq('<<Interstellar - New movie, released 3 years ago.>>') }
-    end     
-    context "when worng imdb_id" do
-      let(:imdb_id){ :tt00000 } 
-      it { expect{ subject }.to raise_error "No data for imdb_id: #{imdb_id}" }   
-    end    
-    #context "when wrong period" do
-    #  before { Dotenv.overload('./spec/wrong_movies.env') } # НЕ ПЕРЕГРУЖАЕТ ENV!!!
-     # let(:imdb_id){ :tt0000001 }
-    #  it { expect{ subject }.to raise_error 'Wrong period to create movie!' }   
-    #end
+    end       
+    context "when wrong period" do
+      subject { Movie.create(wrong_movie, dummycollection) }
+      let(:wrong_movie) { { link: "http://imdb.com/title/tt0816692/?ref_=chttp_tt_0", title: "Wrong test movie", r_year: "2022", country: "USA", r_date: "2022-11-07", genres: "Adventure,Drama,Sci-Fi", runtime: "169 min", rating: "8.7", director: "Christopher Nolan", actors: "Matthew McConaughey,Anne Hathaway,Jessica Chastain" } }
+      it { expect{ subject }.to raise_error 'Wrong period to create movie!' }   
+    end
   end
       
 end

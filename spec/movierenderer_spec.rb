@@ -1,21 +1,21 @@
 require 'simplecov'
 SimpleCov.start
 
-require 'dotenv/load'
+
 require './lib/movierenderer'
 require './lib/netflix'
 require 'webmock/rspec'
 require './spec/mockfetchers'
+require 'dotenv/load'
+
 
 include MkdevMovies
 
 describe MovieRenderer do
-  include_context 'mock_fetchers' 
+  include_context 'mock_fetchers'
   before do
-    Dotenv.load('./spec/movies.env')
-    ENV['FILE_RECORD_TXT'] = './spec/fixtures/one_movie.txt'
-    FileUtils.rm_r(Dir['./spec/tmp/*']) 
-  end
+    Dotenv.overload('./spec/one_movie.env')
+  end 
   after { FileUtils.rm_r(Dir['./spec/tmp/*']) }
   let(:tmdb_image_url) { ENV['TMDB_IMAGE_URL'] }
   let(:movierenderer) { MovieRenderer.new(netflix) }
@@ -30,9 +30,10 @@ describe MovieRenderer do
     it { expect(File.open('./spec/tmp/show_collection.html').read)
           .to eq (File.open('./spec/templates/show_collection.html').read) }
   end
+  
   describe '#download_tmdb_posters' do
     before do
-      stub_request(:get, "#{tmdb_image_url}#{poster_id}")
+      stub_request(:get, /#{tmdb_image_url}/)
                   .to_return(status: 200, body: response)  
       stub_const('MovieRenderer::LOCAL_IMAGES', dir_to_images)
       movierenderer.download_tmdb_posters

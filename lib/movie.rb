@@ -1,38 +1,50 @@
-
-require_relative 'filerecord'
 require_relative 'tmdbrecord'
 require_relative 'imdbrecord'
-
 require_relative 'moviecollection'
+require 'dry-initializer'
 
 module MkdevMovies
-  class Movie
+  class Movie 
+    extend Dry::Initializer
     require_relative 'movie_children'
     PERIODS = { 1900..1945 => AncientMovie, 1946..1968 => ClassicMovie, 1969..2000 => ModernMovie,
                 2001..Date.today.year => NewMovie }.freeze
-    class << self
-      attr_accessor :attributes
-    end
-    @attributes = [:period] + [FileRecord, TMDBRecord, IMDBRecord].map(&:attributes).flatten
+    EXTENDERS = [TMDBRecord, IMDBRecord]
     
-    def initialize(imdb_id, collection)
+    option :link, type: proc(&:to_s)
+    option :title, type: proc(&:to_s)
+    option :r_year, type: proc(&:to_i)
+    option :country, type: proc(&:to_s)
+    option :r_date, type: ->(v) { Date.parse(v) }
+    option :genres, type: ->(v) { v.split(',') }
+    option :runtime, type: proc(&:to_i)
+    option :rating, type: proc(&:to_f)
+    option :director, type: proc(&:to_s)
+    option :actors, type: ->(v) { v.split(',') }
+
+    def self.attributes
+      [:period] + Movie.dry_initializer.attributes(self).keys + EXTENDERS.map(&:attributes).flatten
+    end
+    
+    def initialize(movie, collection)
       @collection = collection
-      @records = [FileRecord, TMDBRecord, IMDBRecord].map do |klass|
+      imdb_id = URI.parse(movie[:link]).path.split('/').last.to_sym
+      @records = EXTENDERS.map do |klass|
         new_record = klass.new(imdb_id, collection.cache)
         klass.import_attributes(Movie, klass)
         [klass, new_record]
       end.to_h
+     super(movie)
     end
 
     def period
       self.class.name.split('::').last
     end
 
-    def self.create(imdb_id, collection)
-      r_year = FileRecord.data(imdb_id, :r_year, collection.cache).to_i
-      _, period =  PERIODS.detect { |key, _class| key.cover?(r_year) }
+    def self.create(movie, collection)
+      _, period =  PERIODS.detect { |key, _class| key.cover?(movie[:r_year].to_i) }
       raise 'Wrong period to create movie!' if period.nil?
-      period.new(imdb_id, collection)
+      period.new(movie, collection)
     end
     
     def has_genre?(genre)

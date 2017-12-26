@@ -5,11 +5,10 @@ module MkdevMovies
   class TMDBRecord < Record
     FIELDS = {  title: :title_ru,
                 poster_path: :poster_id }.freeze
-    
-    class << self
-      attr_reader :attributes
+     
+    def self.attributes
+      FIELDS.values
     end
-    @attributes = FIELDS.values
     
     private
 

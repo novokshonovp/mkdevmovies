@@ -3,11 +3,10 @@ require_relative 'imdbfetcher'
 
 module MkdevMovies
   class IMDBRecord < Record
-    
-    class << self
-      attr_reader :attributes
+ 
+    def self.attributes 
+      [:budget]
     end
-    @attributes = [:budget]
     
     def fetch
       IMDBFetcher.new.data(@imdb_id)
