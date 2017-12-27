@@ -11,7 +11,7 @@ module MkdevMovies
     end
 
     def cached?(id, field)
-      @data[id]&.key?(field)
+      @data[id].key?(field)
     end
 
     def get(id, field)

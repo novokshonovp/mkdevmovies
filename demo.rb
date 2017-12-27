@@ -10,7 +10,7 @@ netflix = Netflix.new
 mr = MovieRenderer.new(netflix)
 template_file = './spec/templates/show_collection.haml'
 output_file = './show_collection.html'
-mr.download_tmdb_posters.render(template_file, output_file) 
+mr.download_tmdb_posters.render(template_file, output_file)
 
 collection = MovieCollection.new
 puts Movie.attributes.inspect

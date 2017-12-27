@@ -4,14 +4,14 @@ require_relative 'moviecollection'
 require 'dry-initializer'
 
 module MkdevMovies
-  class Movie 
+  class Movie
     extend Dry::Initializer
     require_relative 'movie_children'
     PERIODS = { 1900..1945 => AncientMovie, 1946..1968 => ClassicMovie, 1969..2000 => ModernMovie,
                 2001..Date.today.year => NewMovie }.freeze
-    EXTENDERS = [TMDBRecord, IMDBRecord]
-    EXTENDERS.each{ |klass| klass.import_attributes(Movie)}
-    
+    EXTENDERS = [TMDBRecord, IMDBRecord].freeze
+    EXTENDERS.each { |klass| klass.import_attributes(self) }
+
     option :link, type: proc(&:to_s)
     option :title, type: proc(&:to_s)
     option :r_year, type: proc(&:to_i)
@@ -26,7 +26,7 @@ module MkdevMovies
     def self.attributes
       [:period] + Movie.dry_initializer.attributes(self).keys + EXTENDERS.map(&:attributes).flatten
     end
-    
+
     def initialize(movie, collection)
       @collection = collection
       imdb_id = URI.parse(movie[:link]).path.split('/').last.to_sym
@@ -34,7 +34,7 @@ module MkdevMovies
         new_record = klass.new(imdb_id, collection.cache)
         [klass, new_record]
       end.to_h
-     super(movie)
+      super(movie)
     end
 
     def period
@@ -46,7 +46,7 @@ module MkdevMovies
       raise 'Wrong period to create movie!' if period.nil?
       period.new(movie, collection)
     end
-    
+
     def has_genre?(genre)
       genres.include? genre unless collection.filter(genres: genre).count.zero?
     end
