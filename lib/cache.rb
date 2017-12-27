@@ -5,7 +5,7 @@ module MkdevMovies
   class Cache
     attr_reader :data
     def initialize(path)
-      @data = {}
+      @data = Hash.new { |h, k| h[k] = {} }
       @path = path
       load
     end
@@ -19,21 +19,19 @@ module MkdevMovies
     end
 
     def put(id, data)
-      @data[id] ||= {}
-      @data[id] = @data[id].merge(data)
+      @data[id].merge!(data)
       self
     end
 
     def save
-      File.write(@path, @data.to_yaml)
+      File.write(@path, @data.compact.to_yaml)
       self
     end
 
     private
 
     def load
-      @data = YAML.load_file(@path) if File.exist?(@path)
-      @data ||= {}
+      @data.merge!(YAML.load_file(@path)) if File.exist?(@path)
       self
     end
   end

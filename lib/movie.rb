@@ -10,12 +10,13 @@ module MkdevMovies
     PERIODS = { 1900..1945 => AncientMovie, 1946..1968 => ClassicMovie, 1969..2000 => ModernMovie,
                 2001..Date.today.year => NewMovie }.freeze
     EXTENDERS = [TMDBRecord, IMDBRecord]
+    EXTENDERS.each{ |klass| klass.import_attributes(Movie)}
     
     option :link, type: proc(&:to_s)
     option :title, type: proc(&:to_s)
     option :r_year, type: proc(&:to_i)
     option :country, type: proc(&:to_s)
-    option :r_date, type: ->(v) { Date.parse(v) }
+    option :r_date, type: Date.method(:parse)
     option :genres, type: ->(v) { v.split(',') }
     option :runtime, type: proc(&:to_i)
     option :rating, type: proc(&:to_f)
@@ -31,7 +32,6 @@ module MkdevMovies
       imdb_id = URI.parse(movie[:link]).path.split('/').last.to_sym
       @records = EXTENDERS.map do |klass|
         new_record = klass.new(imdb_id, collection.cache)
-        klass.import_attributes(Movie, klass)
         [klass, new_record]
       end.to_h
      super(movie)

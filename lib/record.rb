@@ -2,8 +2,9 @@
 module MkdevMovies
   class Record
      
-    def self.import_attributes(object, mdb_class)
-      mdb_class.attributes.each do |attr|
+    def self.import_attributes(object)
+      mdb_class = self
+      self.attributes.each do |attr|
         object.instance_eval { define_method(attr) { @records[mdb_class].get(attr) } }
       end
     end
