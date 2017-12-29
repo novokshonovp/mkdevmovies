@@ -1,0 +1,4 @@
+http://imdb.com/title/tt0034583/?ref_=chttp_tt_32|Casablanca|1942|USA|1943-01-23|Drama,Romance,War|102 min|8.6|Michael Curtiz|Humphrey Bogart,Ingrid Bergman,Paul Henreid
+http://imdb.com/title/tt0816692/?ref_=chttp_tt_29|Interstellar|2014|USA|2014-11-07|Adventure,Drama,Sci-Fi|169 min|8.7|Christopher Nolan|Matthew McConaughey,Anne Hathaway,Jessica Chastain
+http://imdb.com/title/tt0088247/?ref_=chttp_tt_208|The Terminator|1984|UK|1984-10-26|Action,Sci-Fi|107 min|8.1|James Cameron|Arnold Schwarzenegger,Linda Hamilton,Michael Biehn
+http://imdb.com/title/tt0054215/?ref_=chttp_tt_36|Psycho|1960|USA|1960-09-08|Horror,Mystery,Thriller|109 min|8.6|Alfred Hitchcock|Anthony Perkins,Janet Leigh,Vera Miles
