@@ -2,27 +2,27 @@ require 'simplecov'
 SimpleCov.start
 
 require 'dotenv/load'
-require './lib/netflix'
+require_relative '../lib/mkdevmovies'
 require 'money'
 
-include MkdevMovies
+include Mkdevmovies
 
-shared_examples 'show The Terminator' do 
+shared_examples 'show The Terminator' do
   before do
     allow(Time).to receive(:now).and_return(time_now)
   end
-  let(:terminator_runtime) { 107 }  
+  let(:terminator_runtime) { 107 }
   let(:time_now) { Time.now }
   it {expect { subject}.to output("<<Now showing The Terminator #{ time_now.strftime("%H:%M") } - #{ (time_now + terminator_runtime * 60).strftime("%H:%M") }>>\n").to_stdout }
 end
 
 describe Netflix do
-  before {    Dotenv.overload('./spec/movies.env') }  
+  before {    Dotenv.overload('./spec/movies.env') }
   let(:netflix) {  Netflix.new }
 
   describe '#show' do
     let(:filters) { {title: 'The Terminator'} }
-    subject { netflix.show(filters) } 
+    subject { netflix.show(filters) }
     context 'when not enough money' do
       it { expect { subject } .to raise_error 'Not enough money!' }
     end
@@ -30,7 +30,7 @@ describe Netflix do
         before { netflix.pay(100) }
         let(:film_price) { Money.from_amount(3, :USD) }
         it_behaves_like 'show The Terminator'
-        it { expect{ subject }.to change(netflix, :user_balance).by(-film_price) }  
+        it { expect{ subject }.to change(netflix, :user_balance).by(-film_price) }
       context 'when movie not exist' do
         let(:filters) { { title: 'Non existant movie' } }
         it { expect { subject }.to raise_error 'Wrong filter options.' }
@@ -39,7 +39,7 @@ describe Netflix do
         let(:filters) { { genre: 'Comedy' } }
         it { expect { subject }.to raise_error "Doesn't have field \"#{ filters.keys.first }\"!" }
       end
-      context 'when filter by code block' do    
+      context 'when filter by code block' do
         subject { netflix.show(filters, &block_filter) }
         context 'when return result' do
           let(:block_filter) { ->(movie){  movie.genres.include?('Action') && movie.r_year == 1984 } }
@@ -54,7 +54,7 @@ describe Netflix do
       end
     end
   end
-  
+
   describe '#pay' do
     context 'when amount positive' do
       subject { netflix.pay(amount.amount) }
@@ -68,7 +68,7 @@ describe Netflix do
       it { expect { subject }.to raise_error 'Amount should be positive!' }
     end
   end
-  
+
   describe '#how_much?' do
     let(:film_price) { Money.from_amount(3, :USD) }
     it { expect(netflix.how_much?('The Terminator')).to eq film_price }
@@ -76,7 +76,7 @@ describe Netflix do
   describe '#define_filter' do
     subject { netflix.define_filter(filter) }
     context 'when define' do
-      let (:filter) { ->(movie){  movie.period == 'ModernMovie' && !movie.country.include?('UK') } }      
+      let (:filter) { ->(movie){  movie.period == 'ModernMovie' && !movie.country.include?('UK') } }
       it { expect { subject }.to change(netflix.key_filter.user_filters, :size).by(1) }
     end
   end

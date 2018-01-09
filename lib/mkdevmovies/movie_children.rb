@@ -1,6 +1,6 @@
 
 
-module MkdevMovies
+module Mkdevmovies
   class AncientMovie < Movie
     def to_s
       "<<#{title} - Ancient movie (#{r_year}).>>"

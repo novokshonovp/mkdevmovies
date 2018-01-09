@@ -1,5 +1,5 @@
 
-module MkdevMovies
+module Mkdevmovies
   class Record
      
     def self.import_attributes(object)

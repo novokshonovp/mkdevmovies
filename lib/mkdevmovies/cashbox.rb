@@ -1,6 +1,6 @@
 require 'money'
 I18n.enforce_available_locales = false
-module MkdevMovies
+module Mkdevmovies
   module CashBox
     private def balance
       @balance ||= Money.new(0, :USD)

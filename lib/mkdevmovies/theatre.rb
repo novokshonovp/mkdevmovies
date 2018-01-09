@@ -3,7 +3,7 @@ require_relative 'cinema'
 require_relative 'cashbox'
 require_relative 'schedule'
 
-module MkdevMovies
+module Mkdevmovies
   class Theatre < Cinema
     include CashBox
     include Schedule

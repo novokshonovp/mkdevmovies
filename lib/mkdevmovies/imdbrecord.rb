@@ -1,7 +1,7 @@
 require_relative 'record'
 require_relative 'imdbfetcher'
 
-module MkdevMovies
+module Mkdevmovies
   class IMDBRecord < Record
  
     def self.attributes 

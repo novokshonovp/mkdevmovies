@@ -1,9 +1,10 @@
 require 'simplecov'
 SimpleCov.start
-require './lib/cashbox'
 require 'money'
+require_relative '../lib/mkdevmovies'
 
-include MkdevMovies
+
+include Mkdevmovies
 describe CashBox do
   let(:dummytheatre) { Class.new { include CashBox} }
   let(:cash_box) { cash_box = dummytheatre.new }
@@ -23,7 +24,7 @@ describe CashBox do
   describe ".take" do
     before { cash_box.put_cash(balance) }
     subject { cash_box.take(who) }
-    let(:balance) { 155.12 }    
+    let(:balance) { 155.12 }
     context "when bank" do
       let(:who) { "Bank" }
       it { expect{ subject }.to  output("Cash withdrawn. #{Money.from_amount(balance,:USD).format}\n").to_stdout }
@@ -34,7 +35,7 @@ describe CashBox do
       it { expect{ subject }.to  raise_error "Police!" }
     end
   end
-  
+
   describe ".cash" do
     subject { cash_box.cash.amount }
     context "when init" do

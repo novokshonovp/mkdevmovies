@@ -1,5 +1,5 @@
 require_relative 'cinema'
-module MkdevMovies
+module Mkdevmovies
   class FilterCinema
     attr_reader :user_filters
     def initialize(cinema)

@@ -1,6 +1,6 @@
 require_relative 'period'
 
-module MkdevMovies
+module Mkdevmovies
   module Schedule
     attr_accessor :halls, :schedule
     def initialize(*args, &block)

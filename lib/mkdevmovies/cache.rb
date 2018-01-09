@@ -1,7 +1,7 @@
 
 require 'yaml'
 
-module MkdevMovies
+module Mkdevmovies
   class Cache
     attr_reader :data
     def initialize(path)

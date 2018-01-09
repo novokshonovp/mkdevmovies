@@ -1,8 +1,8 @@
 require 'simplecov'
 SimpleCov.start
 
-require './lib/schedule'
-include MkdevMovies
+require_relative '../lib/mkdevmovies'
+include Mkdevmovies
 
 describe Period do
   let(:period) { Period.new('10:00'..'12:00') do
@@ -11,7 +11,7 @@ describe Period do
                    price 5
                    hall :green
                    end }
-                   
+
   describe '#overlaps?' do
     subject { period.overlaps?(new_period) }
     context 'when overlaps by halls and time range' do
@@ -40,9 +40,9 @@ describe Period do
                              hall :blue
                            end  }
       it { is_expected.to be false }
-    end    
+    end
   end
-                   
+
   describe '#parse_filter' do
     subject { period.parse_filter }
     context 'when has a title' do
@@ -51,7 +51,7 @@ describe Period do
                        title 'The Terminator'
                        price 5
                        hall :blue
-                     end  }     
+                     end  }
       it { is_expected.to eq( { title: "The Terminator" } ) }
     end
     context 'when have filters' do

@@ -1,17 +1,17 @@
 require 'simplecov'
 SimpleCov.start
-require './lib/imdbfetcher'
+require_relative '../lib/mkdevmovies'
 require 'webmock/rspec'
 require './spec/mockfetchers'
 require 'dotenv/load'
 Dotenv.overload('./spec/movies.env')
 
-include MkdevMovies
+include Mkdevmovies
 
-describe IMDBFetcher do  
-  include_context 'mock_fetchers' 
+describe IMDBFetcher do
+  include_context 'mock_fetchers'
   let(:imdbfetcher) { IMDBFetcher.new }
-     
+
   describe '#data' do
     subject { imdbfetcher.data(imdb_id) }
     let(:imdb_id) { "tt0034583" }

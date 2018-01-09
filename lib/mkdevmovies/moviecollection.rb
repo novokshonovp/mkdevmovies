@@ -4,7 +4,7 @@ require 'dotenv'
 require_relative 'movie'
 require_relative 'cache'
 
-module MkdevMovies
+module Mkdevmovies
   class MovieCollection
     include Enumerable
     attr_reader :movies, :cache

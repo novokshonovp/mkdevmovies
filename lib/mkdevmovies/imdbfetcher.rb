@@ -2,7 +2,7 @@ require 'nokogiri'
 require 'open-uri'
 require 'dotenv/load'
 
-module MkdevMovies
+module Mkdevmovies
   class IMDBFetcher
     IMDB_DATA_URL = ENV['IMDB_DATA_URL']
     def data(imdb_id)

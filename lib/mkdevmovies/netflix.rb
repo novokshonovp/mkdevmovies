@@ -1,7 +1,7 @@
 require_relative 'cinema'
 require_relative 'cashbox'
 require_relative 'filtercinema'
-module MkdevMovies
+module Mkdevmovies
   class Netflix < Cinema
     extend CashBox
     PRICES = { AncientMovie: 1, ClassicMovie: 1.5, ModernMovie: 3, NewMovie: 5 }.freeze

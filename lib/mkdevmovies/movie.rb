@@ -3,7 +3,7 @@ require_relative 'imdbrecord'
 require_relative 'moviecollection'
 require 'dry-initializer'
 
-module MkdevMovies
+module Mkdevmovies
   class Movie
     extend Dry::Initializer
     require_relative 'movie_children'

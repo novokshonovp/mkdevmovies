@@ -1,7 +1,7 @@
 require_relative 'record'
 require_relative 'tmdbfetcher'
 
-module MkdevMovies
+module Mkdevmovies
   class TMDBRecord < Record
     FIELDS = {  title: :title_ru,
                 poster_path: :poster_id }.freeze

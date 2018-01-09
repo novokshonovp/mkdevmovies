@@ -1,5 +1,5 @@
 require_relative 'moviecollection'
-module MkdevMovies
+module Mkdevmovies
   class Cinema < MovieCollection
     private
 

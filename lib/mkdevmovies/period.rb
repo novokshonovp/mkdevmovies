@@ -1,4 +1,4 @@
-module MkdevMovies
+module Mkdevmovies
   class Period
     attr_reader :params, :time_range
 

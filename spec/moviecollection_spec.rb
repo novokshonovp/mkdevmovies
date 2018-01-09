@@ -1,11 +1,9 @@
 require 'simplecov'
 SimpleCov.start
-
 require 'dotenv/load'
-require './lib/movie'
-require './lib/moviecollection'
+require_relative '../lib/mkdevmovies'
 
-include MkdevMovies
+include Mkdevmovies
 
 describe MovieCollection do
   before { Dotenv.overload('./spec/movies.env') }
