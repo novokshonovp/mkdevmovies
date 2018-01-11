@@ -2,10 +2,12 @@
 /.yardoc
 /_yardoc/
 /coverage/
-/doc/
 /pkg/
 /spec/reports/
 /tmp/
 Gemfile.lock
-.env
-*.html
+/.env
+/bin/.env
+/*.html
+.gitignore
+*.gem

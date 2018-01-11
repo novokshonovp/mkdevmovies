@@ -22,16 +22,78 @@ And then execute:
 Or install it yourself as:
 
     $ gem install mkdevmovies
+Add environment variables to system
+    $touch .env
+Use your favorite editor and add follow lines to .env file.
+  FILE_RECORD_TXT = './movies.txt'
+  IMDB_DATA_URL = 'http://imdb.com/title/'
+  FILE_CACHE_YAML = './cache.yaml'
+  TMDB_IMAGE_URL = 'http://image.tmdb.org/t/p/w185/'
+  POSTER_IMAGES = './images'
+  TMDB_DATA_URL = 'https://api.themoviedb.org/3/find/'
+  TMDB_API_KEY = 'ADD YOUR API KEY HERE'
 
-## Quick Start
+Download collection to your local directory
+  $curl -O https://raw.githubusercontent.com/novokshonovp/mkdev-movies/master/data/movies.txt
 
-TODO: Write usage instructions here
+Create directory to hold posters images
+  $mkdir images
 
-## Development
+Receive THE MOVIE DB API Key from tmdb.com and add to TMDB_API_KEY
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+## Usage
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+### Quick Start
+```ruby
+  2.4.3 :001 > require 'mkdevmovies'
+ => true
+2.4.3 :002 > include Mkdevmovies
+ => Object
+2.4.3 :003 > col = MovieCollection.new
+ => #<Mkdevmovies::MovieCollection: ...OUTPUT CUTTED...]>]>
+2.4.3 :004 > Movie.attributes
+ => [:period, :link, :title, :r_year, :country, :r_date, :genres, :runtime, :rating, :director, :actors, :title_ru, :poster_id, :budget]
+2.4.3 :005 > col.first.title
+ => "The Shawshank Redemption"
+2.4.3 :006 > col.first.title_ru
+ => "Побег из Шоушенка"
+```
+
+### Collection routine
+Various filter options passes as hash options:
+```ruby
+col = MovieCollection.new
+col.filter(period: 'AncientMovie', r_year: 1942) #filter by period and r_year
+col.filter(genres: 'Drama', exclude_title: 'Interstellar') # or with an exclude field option
+```
+
+Calculate stats data
+```ruby
+col = MovieCollection.new
+col.stats(:director)
+```
+
+Use a collection as an enumerable object
+```ruby
+col = MovieCollection.new
+col.select { |movie| movie.title == 'Casablanca' }.first.title
+```
+
+### Create a schedule
+
+Toolbox allow to create cinema schedules with a simple DSL.
+```ruby
+cinema = Class.new { include Schedule }
+cinema.new do
+             hall :red, title:'Red hall', places: 100
+             hall :blue, title: 'Blue hall', places: 50
+             period '06:00'..'12:00' do
+             description 'Morning show'
+             filters period: 'AncientMovie'
+             price 3
+             hall :red, :blue
+           end
+```
 
 ## Contributing
 

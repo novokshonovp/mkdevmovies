@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+require 'slop'
+require 'mkdevmovies'
+
+include Mkdevmovies
+
+opts = Slop.parse do |o|
+  o.integer '--pay', required: true
+  o.array '--show', required: true
+end
+
+filter = opts[:show].map{ |value| [value.split(':').first.to_sym, value.split(':').last] }.to_h
+nf = Netflix.new
+nf.pay(opts[:pay])
+nf.show(filter)
