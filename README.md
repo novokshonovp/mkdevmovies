@@ -45,18 +45,17 @@ Receive THE MOVIE DB API Key from tmdb.com and add to TMDB_API_KEY
 
 ### Quick Start
 ```ruby
-  2.4.3 :001 > require 'mkdevmovies'
- => true
-2.4.3 :002 > include Mkdevmovies
- => Object
-2.4.3 :003 > col = MovieCollection.new
- => #<Mkdevmovies::MovieCollection: ...OUTPUT CUTTED...]>]>
-2.4.3 :004 > Movie.attributes
- => [:period, :link, :title, :r_year, :country, :r_date, :genres, :runtime, :rating, :director, :actors, :title_ru, :poster_id, :budget]
-2.4.3 :005 > col.first.title
- => "The Shawshank Redemption"
-2.4.3 :006 > col.first.title_ru
- => "Побег из Шоушенка"
+require 'mkdevmovies'
+include Mkdevmovies
+col = MovieCollection.new
+# => #<Mkdevmovies::MovieCollection:14029120 @movies: (250), @cache: (0)>
+
+Movie.attributes
+# => [:period, :link, :title, :r_year, :country, :r_date, :genres, :runtime, :rating, :director, :actors, :title_ru, :poster_id, :budget]
+col.first.title
+# => "The Shawshank Redemption"
+col.first.title_ru
+# => "Побег из Шоушенка"
 ```
 
 ### Collection routine

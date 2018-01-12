@@ -30,17 +30,17 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'safe_yaml'
-  spec.add_dependency 'money'
-  spec.add_dependency 'nokogiri'
-  spec.add_dependency 'dotenv'
-  spec.add_dependency 'csv'
-  spec.add_dependency 'dry-initializer'
-  spec.add_dependency 'haml'
-  spec.add_dependency 'ruby-progressbar'
-  spec.add_dependency 'simplecov'
-  spec.add_dependency 'webmock'
+  spec.add_dependency 'safe_yaml', "~> 1.04"
+  spec.add_dependency 'money', "~> 6.10.1"
+  spec.add_dependency 'nokogiri', "~> 1.8.1"
+  spec.add_dependency 'dotenv', "~>2.2.1"
+  spec.add_dependency 'dry-initializer', "~> 2.3.0"
+  spec.add_dependency 'haml', "~> 5.0.4"
+  spec.add_dependency 'ruby-progressbar', "~> 1.9.0"
+
+  spec.add_development_dependency 'simplecov', "~> 0.15.1"
+  spec.add_development_dependency 'webmock', "~> 3.1.1"
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec", "~> 3.7.0"
 end

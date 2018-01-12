@@ -2,8 +2,36 @@ require_relative 'period'
 
 module Mkdevmovies
   # @author Pavel Novokshonov
+  # Schedule mixin provides DSL syntax to create a cinema schedule.
+  # It allows to create a hall with three params: hall_id [Symbol],
+  # title [String] and places [Integer].
+  # Working time of halls describes with period keyword. Period gets
+  # working hours range as an argument and period params as a block.
+  # Period params: description, filters, price, title, hall.
+  #
+  #
+  #   cinema = Class.new { include Schedule } # Mix Schedule to a custom class
+  #   cn = cinema.new do # Create an instance of class
+  #                      hall :red, title:'Red hall', places: 100 # Pass hall params
+  #                      period '06:00'..'12:00' do # Pass working ours
+  #                        description 'Morning show' # Pass a period description
+  #                        filters period: 'AncientMovie' # Pass filter options
+  #                        price 3 # Pass a title
+  #                        hall :red # Pass a hall id
+  #                      end
+  #                    end
+  #   cn.halls # Get halls information
+  #   # => {:red=>{:title=>"Red hall", :places=>100}}
+  #   cn.schedule # Get a schedule of a cinema
+  #   # =>#<Mkdevmovies::Period:0x0000000001b10890 @params=
+  #   # {:description=>"Morning show", :filters=>{:period=>"AncientMovie"},
+  #   # :price=>3, :hall=>:red}, @time_range="06:00".."12:00">
+  #   cn.halls_by_periods #Get halls and periods in hash
+  #   # =>{:red=>["06:00".."12:00"]}
+  #   cn.period_by_time(Time.parse('11:00'), :red) #Get Period object by time and a hall
+
   module Schedule
-    # @return [Hash] Returns a hash of halls and theirs params ( { hall_id: { title: "Example title", places: int_number_of_places } } ).
+    # @return [Hash] Returns a hash of halls.
     attr_reader :halls
     # @return [Array<Period>] Returns an array of Period objects.
     attr_reader :schedule
@@ -12,18 +40,6 @@ module Mkdevmovies
     #  Checks given block and fills @halls and @schedule structures.
     # @param args [Array] Additional params.
     # @param block [Proc] A block of a schedule definition
-    # @example
-    #   cinema = Class.new { include Schedule }
-    #   cinema.new do
-    #                hall :red, title:'Red hall', places: 100
-    #                hall :blue, title: 'Blue hall', places: 50
-    #                period '06:00'..'12:00' do
-    #                  description 'Morning show'
-    #                  filters period: 'AncientMovie'
-    #                  price 3
-    #                  hall :red, :blue
-    #                end
-    #              end
     def initialize(*args, &block)
       raise 'Need a block to create Theatre!' unless block_given?
       super(*args)
