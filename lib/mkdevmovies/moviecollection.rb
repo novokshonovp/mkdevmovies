@@ -17,9 +17,9 @@ module Mkdevmovies
   #   col.stats(:director) # returns set of directors and number of movies shooted by him
   #   col.by_genres.comedy # filters collection by genre <comedy>
   #   col.by_country.USA # filters collection by country <USA>
-  # @attr_reader [Cache] cache Cache object for IMDB and TMDB data fetchers
   class MovieCollection
     include Enumerable
+    # @return [Cache] Returns a Cache object for IMDB and TMDB data fetchers.
     attr_reader :cache
     # List of columns in a csv file with movies
     DATA_STRUCTURE = %i[link title r_year country r_date genres runtime rating director actors].freeze
